@@ -1,0 +1,914 @@
+[
+    {
+        "id": "26e4288f.649ff8",
+        "type": "tab",
+        "label": "Descargas",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "d8e3e688.997b58",
+        "type": "ui_switch",
+        "z": "26e4288f.649ff8",
+        "name": "separador decimal",
+        "label": "{{msg.topic}}",
+        "tooltip": "",
+        "group": "2492c311.67a84c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 853.8958282470703,
+        "y": 239.8889045715332,
+        "wires": [
+            [
+                "c2625574.6e2ec8"
+            ]
+        ]
+    },
+    {
+        "id": "a099c77a.fe3288",
+        "type": "inject",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 834.892894744873,
+        "y": 162.80078601837158,
+        "wires": [
+            [
+                "c2625574.6e2ec8"
+            ]
+        ]
+    },
+    {
+        "id": "c2625574.6e2ec8",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "set global separador_decimal",
+        "func": "if(msg.payload===true)\n{\n    global.set(\"separador_decimal\",\"coma\");\n    msg.topic=\"separador decimal = coma\";\n}\nelse\n{\n    global.set(\"separador_decimal\",\"punto\");\n    msg.topic=\"separador decimal = punto\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1162.904281616211,
+        "y": 163.50815868377686,
+        "wires": [
+            [
+                "d8e3e688.997b58"
+            ]
+        ]
+    },
+    {
+        "id": "b7fad7aa.4aeef8",
+        "type": "comment",
+        "z": "26e4288f.649ff8",
+        "name": "Selector de separador decimal",
+        "info": "",
+        "x": 846.9070587158203,
+        "y": 102.46291065216064,
+        "wires": []
+    },
+    {
+        "id": "dfe21155.1570c",
+        "type": "ui_template",
+        "z": "26e4288f.649ff8",
+        "group": "40e959dd.55f238",
+        "name": "",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros_datos\" class=\"button\">Descarga registros de datos en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 182.89592361450195,
+        "y": 392.777286529541,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "70671c31.8f76c4",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1225.9998474121094,
+        "y": 446.7770948410034,
+        "wires": [
+            [
+                "a961100e.1f345"
+            ]
+        ]
+    },
+    {
+        "id": "a961100e.1f345",
+        "type": "http response",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registrodatos.csv"
+        },
+        "x": 1395.9997215270996,
+        "y": 446.77716541290283,
+        "wires": []
+    },
+    {
+        "id": "396203c1.8f649c",
+        "type": "csv",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, temperatura, humedad, Nivel_agua, CHIPID",
+        "skip": 0,
+        "x": 1044.9999923706055,
+        "y": 446.7770719528198,
+        "wires": [
+            [
+                "70671c31.8f76c4"
+            ]
+        ]
+    },
+    {
+        "id": "e22382e4.5f8ec",
+        "type": "http in",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "url": "/registros_datos",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 214.00009155273438,
+        "y": 457.77680015563965,
+        "wires": [
+            [
+                "2d1b1d88.2f2802"
+            ]
+        ]
+    },
+    {
+        "id": "c96c9b0.a1b3568",
+        "type": "mongodb in",
+        "z": "26e4288f.649ff8",
+        "mongodb": "96b00be6.0095f8",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 823.8958053588867,
+        "y": 450.99886989593506,
+        "wires": [
+            [
+                "396203c1.8f649c"
+            ]
+        ]
+    },
+    {
+        "id": "2d1b1d88.2f2802",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "agrega por fecha descarga datos",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\",\n        \"humedad\": \"$DHT11.Humedad\",\n        \"Nivel_agua\": \"$NivelAgua\",\n        \"CHIPID\" : \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\",\n        \"humedad\": \"$DHT11.Humedad\",\n        \"Nivel_agua\": \"$NivelAgua\",\n        \"CHIPID\" : \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 516.8959350585938,
+        "y": 457.77684783935547,
+        "wires": [
+            [
+                "c96c9b0.a1b3568"
+            ]
+        ]
+    },
+    {
+        "id": "62ac1a86.e110a4",
+        "type": "mongodb in",
+        "z": "26e4288f.649ff8",
+        "mongodb": "96b00be6.0095f8",
+        "name": "",
+        "collection": "led",
+        "operation": "aggregate",
+        "x": 841.8957138061523,
+        "y": 652.8891143798828,
+        "wires": [
+            [
+                "c1d5b326.26cb6"
+            ]
+        ]
+    },
+    {
+        "id": "395cecee.9e3b64",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "agrega por fecha descarga led",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"nivel_led\": \"$led\",\n        \"origen\": \"$origen\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"nivel_led\": \"$led\",\n        \"origen\": \"$origen\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 486.8957214355469,
+        "y": 648.8889789581299,
+        "wires": [
+            [
+                "62ac1a86.e110a4"
+            ]
+        ]
+    },
+    {
+        "id": "c853f327.7dfd8",
+        "type": "ui_dropdown",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "label": "Selector usuario",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "93f3fa8b.c19378",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "TODOS",
+                "value": "ESP0",
+                "type": "str"
+            },
+            {
+                "label": "PACO",
+                "value": "ESP1126067",
+                "type": "str"
+            },
+            {
+                "label": "PABLO",
+                "value": "ESP833295",
+                "type": "str"
+            },
+            {
+                "label": "SERGIO",
+                "value": "ESP5821794",
+                "type": "str"
+            },
+            {
+                "label": "ADRI",
+                "value": "ESP1089673",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 277.8958435058594,
+        "y": 56.888885498046875,
+        "wires": [
+            [
+                "d0bce243.964d9"
+            ]
+        ]
+    },
+    {
+        "id": "d0bce243.964d9",
+        "type": "change",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "usuario",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 489.8958435058594,
+        "y": 57.888885498046875,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9c5ba509.cd14a8",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1279.4514617919922,
+        "y": 651.6667251586914,
+        "wires": [
+            [
+                "cf7a6f07.6aa1c"
+            ]
+        ]
+    },
+    {
+        "id": "cf7a6f07.6aa1c",
+        "type": "http response",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registroled.csv"
+        },
+        "x": 1449.4513359069824,
+        "y": 651.6667957305908,
+        "wires": []
+    },
+    {
+        "id": "c1d5b326.26cb6",
+        "type": "csv",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, chipid, nivel_led, origen",
+        "skip": 0,
+        "x": 1091.4516868591309,
+        "y": 651.6666889190674,
+        "wires": [
+            [
+                "9c5ba509.cd14a8"
+            ]
+        ]
+    },
+    {
+        "id": "7f9962e2.edd9dc",
+        "type": "ui_template",
+        "z": "26e4288f.649ff8",
+        "group": "7f6f96f4.d95a98",
+        "name": "",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros_led\" class=\"button\">Descarga registros de LED en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 160.45140075683594,
+        "y": 584.6666784286499,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bc3f7405.2bb678",
+        "type": "http in",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "url": "/registros_led",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 183.45140075683594,
+        "y": 648.7777729034424,
+        "wires": [
+            [
+                "395cecee.9e3b64"
+            ]
+        ]
+    },
+    {
+        "id": "f79f9c68.7c374",
+        "type": "mongodb in",
+        "z": "26e4288f.649ff8",
+        "mongodb": "96b00be6.0095f8",
+        "name": "",
+        "collection": "switch",
+        "operation": "aggregate",
+        "x": 853.4513397216797,
+        "y": 788.7779836654663,
+        "wires": [
+            [
+                "ec93ce89.1b76b"
+            ]
+        ]
+    },
+    {
+        "id": "ab0acfc1.a8f9b",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "agrega por fecha descarga switch",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"switch\": \"$Switch\",\n        \"origen\": \"$origen\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"switch\": \"$Switch\",\n        \"origen\": \"$origen\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 502.4513854980469,
+        "y": 795.7777709960938,
+        "wires": [
+            [
+                "f79f9c68.7c374"
+            ]
+        ]
+    },
+    {
+        "id": "f61b7f55.25e9b",
+        "type": "http in",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "url": "/registros_switch",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 182.45138549804688,
+        "y": 796.7777938842773,
+        "wires": [
+            [
+                "ab0acfc1.a8f9b"
+            ]
+        ]
+    },
+    {
+        "id": "f6fa3957.e054a8",
+        "type": "ui_template",
+        "z": "26e4288f.649ff8",
+        "group": "7f6f96f4.d95a98",
+        "name": "",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros_switch\" class=\"button\">Descarga registros de Switch en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 165.45138549804688,
+        "y": 729.7777633666992,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bde3b77a.47fea8",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1290.451416015625,
+        "y": 788.7777709960938,
+        "wires": [
+            [
+                "15f428be.c51237"
+            ]
+        ]
+    },
+    {
+        "id": "15f428be.c51237",
+        "type": "http response",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registroswitch.csv"
+        },
+        "x": 1460.4512901306152,
+        "y": 788.7778415679932,
+        "wires": []
+    },
+    {
+        "id": "ec93ce89.1b76b",
+        "type": "csv",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, chipid, switch, origen",
+        "skip": 0,
+        "x": 1102.4516410827637,
+        "y": 788.7777347564697,
+        "wires": [
+            [
+                "bde3b77a.47fea8"
+            ]
+        ]
+    },
+    {
+        "id": "f14b0a10.67d648",
+        "type": "mongodb in",
+        "z": "26e4288f.649ff8",
+        "mongodb": "96b00be6.0095f8",
+        "name": "",
+        "collection": "conexion",
+        "operation": "aggregate",
+        "x": 842.4513549804688,
+        "y": 969.2221975326538,
+        "wires": [
+            [
+                "551df6fc.a977f8"
+            ]
+        ]
+    },
+    {
+        "id": "42a16cbf.b0ac74",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "agrega por fecha descarga conexion",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"conexion\": \"$online\",\n        \"chipid\": \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"conexion\": \"$online\",\n        \"chipid\": \"$CHIPID\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 491.451416015625,
+        "y": 972.2219076156616,
+        "wires": [
+            [
+                "f14b0a10.67d648"
+            ]
+        ]
+    },
+    {
+        "id": "93c2b640.bd4f58",
+        "type": "http in",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "url": "/registros_conexion",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 171.45140075683594,
+        "y": 977.2220077514648,
+        "wires": [
+            [
+                "42a16cbf.b0ac74"
+            ]
+        ]
+    },
+    {
+        "id": "fb711be.99908e8",
+        "type": "ui_template",
+        "z": "26e4288f.649ff8",
+        "group": "1dbe45e3.27014a",
+        "name": "",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros_conexion\" class=\"button\">Descarga registros de Conexion en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 144.45140075683594,
+        "y": 910.2219772338867,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "97469016.cfad1",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1269.451431274414,
+        "y": 969.2219848632812,
+        "wires": [
+            [
+                "bfa4384e.ec4738"
+            ]
+        ]
+    },
+    {
+        "id": "bfa4384e.ec4738",
+        "type": "http response",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registroconexion.csv"
+        },
+        "x": 1439.4513053894043,
+        "y": 969.2220554351807,
+        "wires": []
+    },
+    {
+        "id": "551df6fc.a977f8",
+        "type": "csv",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, conexion, chipid",
+        "skip": 0,
+        "x": 1081.4516563415527,
+        "y": 969.2219486236572,
+        "wires": [
+            [
+                "97469016.cfad1"
+            ]
+        ]
+    },
+    {
+        "id": "4075c556.58878c",
+        "type": "ui_date_picker",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "label": "Fecha inicio",
+        "group": "93f3fa8b.c19378",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 271.4513854980469,
+        "y": 151.88888549804688,
+        "wires": [
+            [
+                "ca978c53.2987d"
+            ]
+        ]
+    },
+    {
+        "id": "a398376e.3c8488",
+        "type": "ui_date_picker",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "label": "Fecha final",
+        "group": "93f3fa8b.c19378",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 269.4513854980469,
+        "y": 220.88888549804688,
+        "wires": [
+            [
+                "ce491d4e.bedc6"
+            ]
+        ]
+    },
+    {
+        "id": "ca978c53.2987d",
+        "type": "change",
+        "z": "26e4288f.649ff8",
+        "name": "desde",
+        "rules": [
+            {
+                "t": "set",
+                "p": "desde",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 427.4513854980469,
+        "y": 151.88888549804688,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ce491d4e.bedc6",
+        "type": "change",
+        "z": "26e4288f.649ff8",
+        "name": "hasta",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hasta",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430.4513854980469,
+        "y": 219.88888549804688,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc14bdb1.b8492",
+        "type": "mongodb in",
+        "z": "26e4288f.649ff8",
+        "mongodb": "96b00be6.0095f8",
+        "name": "",
+        "collection": "errores",
+        "operation": "aggregate",
+        "x": 826.9999542236328,
+        "y": 1187.2222900390625,
+        "wires": [
+            [
+                "224f2d70.832102"
+            ]
+        ]
+    },
+    {
+        "id": "f9d2fbd7.24d168",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "agrega por fecha descarga errores",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"error_Temperatura\": \"$errorTemp\",\n        \"error_Humedad\": \"$errorHum\",\n        \"error_Nivel_Agua\": \"$errorNivelAgua\",\n        \"chipid\": \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"error_Temperatura\": \"$errorTemp\",\n        \"error_Humedad\": \"$errorHum\",\n        \"error_Nivel_Agua\": \"$errorNivelAgua\",\n        \"chipid\": \"$CHIPID\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 476.00001525878906,
+        "y": 1190.2220001220703,
+        "wires": [
+            [
+                "dc14bdb1.b8492"
+            ]
+        ]
+    },
+    {
+        "id": "e0186ef3.3d1",
+        "type": "http in",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "url": "/registros_errores",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1185.2225513458252,
+        "wires": [
+            [
+                "f9d2fbd7.24d168"
+            ]
+        ]
+    },
+    {
+        "id": "4d41c161.c83fb",
+        "type": "function",
+        "z": "26e4288f.649ff8",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1264.0000305175781,
+        "y": 1187.22207736969,
+        "wires": [
+            [
+                "d8dc1eeb.32f36"
+            ]
+        ]
+    },
+    {
+        "id": "d8dc1eeb.32f36",
+        "type": "http response",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=registroerrores.csv"
+        },
+        "x": 1433.9999046325684,
+        "y": 1187.2221479415894,
+        "wires": []
+    },
+    {
+        "id": "224f2d70.832102",
+        "type": "csv",
+        "z": "26e4288f.649ff8",
+        "name": "",
+        "sep": ";",
+        "hdrin": "",
+        "hdrout": true,
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, error_Temperatura, error_Humedad, error_Nivel_Agua, chipid",
+        "skip": 0,
+        "x": 1076.0002555847168,
+        "y": 1187.222041130066,
+        "wires": [
+            [
+                "4d41c161.c83fb"
+            ]
+        ]
+    },
+    {
+        "id": "101245d5.f203da",
+        "type": "ui_template",
+        "z": "26e4288f.649ff8",
+        "group": "59efce77.22684",
+        "name": "",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #339966;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #26734d;\n  }\n\n</style>\n<a href=\"/registros_errores\" class=\"button\">Descarga registros de Errores en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 165.45138549804688,
+        "y": 1107.2222900390625,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2492c311.67a84c",
+        "type": "ui_group",
+        "name": "Separador",
+        "tab": "c5354903.048c08",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "40e959dd.55f238",
+        "type": "ui_group",
+        "name": "Descarga datos",
+        "tab": "c5354903.048c08",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "96b00be6.0095f8",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "II8",
+        "name": ""
+    },
+    {
+        "id": "93f3fa8b.c19378",
+        "type": "ui_group",
+        "name": "Seleccion",
+        "tab": "c5354903.048c08",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "7f6f96f4.d95a98",
+        "type": "ui_group",
+        "name": "Descarga actuadores",
+        "tab": "c5354903.048c08",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "1dbe45e3.27014a",
+        "type": "ui_group",
+        "name": "Descarga conexion",
+        "tab": "c5354903.048c08",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "59efce77.22684",
+        "type": "ui_group",
+        "name": "Descarga errores",
+        "tab": "c5354903.048c08",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "c5354903.048c08",
+        "type": "ui_tab",
+        "name": "Descargas",
+        "icon": "dashboard",
+        "order": 10,
+        "disabled": false,
+        "hidden": false
+    }
+]

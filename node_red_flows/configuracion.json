@@ -1,0 +1,907 @@
+[
+    {
+        "id": "23089cbf.3188e4",
+        "type": "tab",
+        "label": "Configuración y acciones",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8a92d35a.2e47c",
+        "type": "function",
+        "z": "23089cbf.3188e4",
+        "name": "config",
+        "func": "var temp=global.get(\"temp\");\nvar frecled=global.get(\"frecled\");\nvar frecActualizacion=global.get(\"frecActualizacion\");\nvar LogicaDigital=global.get(\"LogicaDigital\");\nvar LogicaPWM=global.get(\"LogicaPWM\");\n\nmsg.payload={\"frecuencia\":temp,\"frecled\":frecled,\"frecActualizacion\":frecActualizacion,\"LogicaDigital\":LogicaDigital,\"LogicaPWM\":LogicaPWM};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 619.4285888671875,
+        "y": 180.14285278320312,
+        "wires": [
+            [
+                "c8779bf.1bd5a68"
+            ]
+        ]
+    },
+    {
+        "id": "6e7438b3.a99f18",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "temp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 369,
+        "y": 129.00002670288086,
+        "wires": [
+            [
+                "8a92d35a.2e47c"
+            ]
+        ]
+    },
+    {
+        "id": "92e4daec.71a1f8",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "frecled",
+        "rules": [
+            {
+                "t": "set",
+                "p": "frecled",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 365,
+        "y": 176,
+        "wires": [
+            [
+                "8a92d35a.2e47c"
+            ]
+        ]
+    },
+    {
+        "id": "5696c154.b624",
+        "type": "ui_text_input",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Frecuencia envío datos (s)",
+        "tooltip": "",
+        "group": "30e1dad9.f93d06",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "number",
+        "delay": 300,
+        "topic": "",
+        "x": 138,
+        "y": 128.0000228881836,
+        "wires": [
+            [
+                "6e7438b3.a99f18"
+            ]
+        ]
+    },
+    {
+        "id": "8d9b9a94.462a68",
+        "type": "ui_text_input",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Frecuencia cambio LED (ms)",
+        "tooltip": "",
+        "group": "30e1dad9.f93d06",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "number",
+        "delay": 300,
+        "topic": "",
+        "x": 137,
+        "y": 177,
+        "wires": [
+            [
+                "92e4daec.71a1f8"
+            ]
+        ]
+    },
+    {
+        "id": "3726e3d9.20848c",
+        "type": "ui_text_input",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Frecuencia actualización (min)",
+        "tooltip": "",
+        "group": "30e1dad9.f93d06",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "number",
+        "delay": 300,
+        "topic": "",
+        "x": 142,
+        "y": 225.85714149475098,
+        "wires": [
+            [
+                "ce3748e9.46a298"
+            ]
+        ]
+    },
+    {
+        "id": "ce3748e9.46a298",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "frecActualizacion",
+        "rules": [
+            {
+                "t": "set",
+                "p": "frecActualizacion",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 398.42856216430664,
+        "y": 226.28571701049805,
+        "wires": [
+            [
+                "8a92d35a.2e47c"
+            ]
+        ]
+    },
+    {
+        "id": "53e1a556.8d040c",
+        "type": "ui_switch",
+        "z": "23089cbf.3188e4",
+        "name": "Lógica Switch",
+        "label": "Lógica Switch (OFF:negativa / ON:positiva)",
+        "tooltip": "",
+        "group": "30e1dad9.f93d06",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "Lógica Digital",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 97,
+        "y": 280,
+        "wires": [
+            [
+                "159f9911.7cd507"
+            ]
+        ]
+    },
+    {
+        "id": "159f9911.7cd507",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "Lógica Switch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "LogicaDigital",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 388.4285583496094,
+        "y": 279.28570556640625,
+        "wires": [
+            [
+                "8a92d35a.2e47c"
+            ]
+        ]
+    },
+    {
+        "id": "cda67b17.e32258",
+        "type": "ui_switch",
+        "z": "23089cbf.3188e4",
+        "name": "Lógica LED",
+        "label": "Lógica LED (OFF:negativa / ON:positiva)",
+        "tooltip": "",
+        "group": "30e1dad9.f93d06",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 88.66665649414062,
+        "y": 329.1111698150635,
+        "wires": [
+            [
+                "71309552.a1065c"
+            ]
+        ]
+    },
+    {
+        "id": "71309552.a1065c",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "Lógica PWM",
+        "rules": [
+            {
+                "t": "set",
+                "p": "LogicaPWM",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 383.32436752319336,
+        "y": 330.73021030426025,
+        "wires": [
+            [
+                "8a92d35a.2e47c"
+            ]
+        ]
+    },
+    {
+        "id": "d4845f35.5c646",
+        "type": "ui_switch",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Switch OFF - ON",
+        "tooltip": "",
+        "group": "9b245482.5b7a38",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 113,
+        "y": 452,
+        "wires": [
+            [
+                "2cc8518f.94fc5e"
+            ]
+        ]
+    },
+    {
+        "id": "2cc8518f.94fc5e",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "Switch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "LedDigital",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 297,
+        "y": 453,
+        "wires": [
+            [
+                "6c30e1a1.27695"
+            ]
+        ]
+    },
+    {
+        "id": "6aa9cb26.60c994",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/switch/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 731.2857055664062,
+        "y": 379.28569889068604,
+        "wires": []
+    },
+    {
+        "id": "ec65fb54.1c1fa8",
+        "type": "ui_button",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "group": "7144ea67.5ccf74",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Actualizar",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "",
+        "x": 68,
+        "y": 876,
+        "wires": [
+            [
+                "8abc7c19.5561e"
+            ]
+        ]
+    },
+    {
+        "id": "8abc7c19.5561e",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "actualiza",
+        "rules": [
+            {
+                "t": "set",
+                "p": "actualiza",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 295,
+        "y": 874,
+        "wires": [
+            [
+                "b96b446d.d12778"
+            ]
+        ]
+    },
+    {
+        "id": "51236c8.91f3494",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/FOTA",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 728,
+        "y": 798,
+        "wires": []
+    },
+    {
+        "id": "b96b446d.d12778",
+        "type": "function",
+        "z": "23089cbf.3188e4",
+        "name": "Actualizar",
+        "func": "var actualiza=global.get(\"actualiza\");\nvar selector=global.get(\"selector\");\n\nmsg.payload={\"actualiza\":actualiza};\nglobal.set(\"actualiza\",false);\n\nif (selector===0) {\n    return [msg,msg,msg,msg];\n}\nelse if (selector==1) {\n    return [msg,null,null,null];\n}\nelse if (selector==2) {\n    return [null,msg,null,null];\n}\nelse if (selector==3) {\n    return [null,null,msg,null];\n}\nelse if (selector==4) {\n    return [null,null,null,msg];\n}\n\n",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 458,
+        "y": 871,
+        "wires": [
+            [
+                "51236c8.91f3494"
+            ],
+            [
+                "a2e13eb4.4fb8e"
+            ],
+            [
+                "8c661b45.149338"
+            ],
+            [
+                "f4f425b4.f13a18"
+            ]
+        ]
+    },
+    {
+        "id": "6c30e1a1.27695",
+        "type": "function",
+        "z": "23089cbf.3188e4",
+        "name": "Switch",
+        "func": "var LedDigital=global.get(\"LedDigital\");\nvar selector=global.get(\"selector\");\n\nmsg.payload={\"LedDigital\":LedDigital};\n\nif (selector===0) {\n    return [msg,msg,msg,msg];\n}\nelse if (selector==1) {\n    return [msg,null,null,null];\n}\nelse if (selector==2) {\n    return [null,msg,null,null];\n}\nelse if (selector==3) {\n    return [null,null,msg,null];\n}\nelse if (selector==4) {\n    return [null,null,null,msg];\n}\n",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 481,
+        "y": 453,
+        "wires": [
+            [
+                "6aa9cb26.60c994"
+            ],
+            [
+                "2bcc0ca7.905034"
+            ],
+            [
+                "46a1ff33.ecd16"
+            ],
+            [
+                "9532c1f1.28d6c"
+            ]
+        ]
+    },
+    {
+        "id": "328489d0.8c08d6",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/led/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 724,
+        "y": 592,
+        "wires": []
+    },
+    {
+        "id": "bd6a13c7.ff3fe",
+        "type": "ui_slider",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Intensidad del LED",
+        "tooltip": "",
+        "group": "9b245482.5b7a38",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "x": 111,
+        "y": 655.9999389648438,
+        "wires": [
+            [
+                "7868b9ef.945fb8"
+            ]
+        ]
+    },
+    {
+        "id": "7868b9ef.945fb8",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "led",
+        "rules": [
+            {
+                "t": "set",
+                "p": "led",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 309.8571472167969,
+        "y": 655.9999389648438,
+        "wires": [
+            [
+                "994342b8.e9d0d"
+            ]
+        ]
+    },
+    {
+        "id": "994342b8.e9d0d",
+        "type": "function",
+        "z": "23089cbf.3188e4",
+        "name": "Nivel led",
+        "func": "var led=global.get(\"led\");\nvar selector=global.get(\"selector\");\n\nmsg.payload = {\"level\":led};\n\nif (selector===0) {\n    return [msg,msg,msg,msg];\n}\nelse if (selector==1) {\n    return [msg,null,null,null];\n}\nelse if (selector==2) {\n    return [null,msg,null,null];\n}\nelse if (selector==3) {\n    return [null,null,msg,null];\n}\nelse if (selector==4) {\n    return [null,null,null,msg];\n}\n",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 464.9444580078125,
+        "y": 655.4443359375,
+        "wires": [
+            [
+                "328489d0.8c08d6"
+            ],
+            [
+                "cd907e0b.87d3a"
+            ],
+            [
+                "77cf4067.b472"
+            ],
+            [
+                "8cd74e6d.83831"
+            ]
+        ]
+    },
+    {
+        "id": "a3caf486.1f33c8",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/config",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 1070.2857055664062,
+        "y": 114.42857456207275,
+        "wires": []
+    },
+    {
+        "id": "41f394f7.b28bac",
+        "type": "ui_dropdown",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "label": "Selector de usuario",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "23c494fb.a0407c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "Todos",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Paco",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Pablo",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "Sergio",
+                "value": 3,
+                "type": "num"
+            },
+            {
+                "label": "Adri",
+                "value": 4,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 116,
+        "y": 39,
+        "wires": [
+            [
+                "89c93cd8.56921"
+            ]
+        ]
+    },
+    {
+        "id": "89c93cd8.56921",
+        "type": "change",
+        "z": "23089cbf.3188e4",
+        "name": "Selector",
+        "rules": [
+            {
+                "t": "set",
+                "p": "selector",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 315,
+        "y": 37,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd907e0b.87d3a",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP833295/led/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 730,
+        "y": 635,
+        "wires": []
+    },
+    {
+        "id": "77cf4067.b472",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP5821794/led/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 730,
+        "y": 679,
+        "wires": []
+    },
+    {
+        "id": "8cd74e6d.83831",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1089673/led/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 724,
+        "y": 725,
+        "wires": []
+    },
+    {
+        "id": "a2e13eb4.4fb8e",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP833295/FOTA",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 732,
+        "y": 843,
+        "wires": []
+    },
+    {
+        "id": "8c661b45.149338",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP5821794/FOTA",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 732,
+        "y": 887,
+        "wires": []
+    },
+    {
+        "id": "f4f425b4.f13a18",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1089673/FOTA",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 726,
+        "y": 933,
+        "wires": []
+    },
+    {
+        "id": "2bcc0ca7.905034",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP833295/switch/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 751.2857055664062,
+        "y": 427.28569889068604,
+        "wires": []
+    },
+    {
+        "id": "46a1ff33.ecd16",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP5821794/switch/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 751.2857055664062,
+        "y": 471.28569889068604,
+        "wires": []
+    },
+    {
+        "id": "9532c1f1.28d6c",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1089673/switch/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 745.2857055664062,
+        "y": 517.285698890686,
+        "wires": []
+    },
+    {
+        "id": "c8779bf.1bd5a68",
+        "type": "function",
+        "z": "23089cbf.3188e4",
+        "name": "Selector config",
+        "func": "var selector=global.get(\"selector\");\n\nif (selector===0) {\n    return [msg,msg,msg,msg];\n}\nelse if (selector==1) {\n    return [msg,null,null,null];\n}\nelse if (selector==2) {\n    return [null,msg,null,null];\n}\nelse if (selector==3) {\n    return [null,null,msg,null];\n}\nelse if (selector==4) {\n    return [null,null,null,msg];\n}\n",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 794.2857055664062,
+        "y": 181.42857360839844,
+        "wires": [
+            [
+                "a3caf486.1f33c8"
+            ],
+            [
+                "89d55421.376c08"
+            ],
+            [
+                "eb948edd.a22f"
+            ],
+            [
+                "28680295.2b6ade"
+            ]
+        ]
+    },
+    {
+        "id": "89d55421.376c08",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP833295/config",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 1076.2857055664062,
+        "y": 157.42857456207275,
+        "wires": []
+    },
+    {
+        "id": "eb948edd.a22f",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP5821794/config",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 1086.2857055664062,
+        "y": 201.42857456207275,
+        "wires": []
+    },
+    {
+        "id": "28680295.2b6ade",
+        "type": "mqtt out",
+        "z": "23089cbf.3188e4",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1089673/config",
+        "qos": "",
+        "retain": "",
+        "broker": "eb3eacc7.100f5",
+        "x": 1080.2857055664062,
+        "y": 247.42857456207275,
+        "wires": []
+    },
+    {
+        "id": "30e1dad9.f93d06",
+        "type": "ui_group",
+        "name": "Configuración",
+        "tab": "bd6af99b.2308e8",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "9b245482.5b7a38",
+        "type": "ui_group",
+        "name": "Órdenes actuadores",
+        "tab": "bd6af99b.2308e8",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "eb3eacc7.100f5",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "7144ea67.5ccf74",
+        "type": "ui_group",
+        "name": "Actualización Firmware",
+        "tab": "bd6af99b.2308e8",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "23c494fb.a0407c",
+        "type": "ui_group",
+        "name": "Selector",
+        "tab": "bd6af99b.2308e8",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "bd6af99b.2308e8",
+        "type": "ui_tab",
+        "name": "Configuración y acciones",
+        "icon": "dashboard",
+        "order": 11,
+        "disabled": false,
+        "hidden": false
+    }
+]

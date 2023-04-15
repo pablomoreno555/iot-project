@@ -1,0 +1,3122 @@
+[
+    {
+        "id": "db06b081.fe408",
+        "type": "tab",
+        "label": "Consultas",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b0df84e1.a8e378",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "b65b8ba5.aced58",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Último día",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 67,
+        "y": 337,
+        "wires": [
+            [
+                "f436c608.ded538",
+                "4e16d018.08e49",
+                "6fd3dc3f.7ccf84",
+                "5747e384.66d45c",
+                "62268815.89f788",
+                "57e06f07.f13cd"
+            ]
+        ]
+    },
+    {
+        "id": "4080bcd5.4de454",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 603,
+        "y": 182,
+        "wires": [
+            [
+                "ab5a33b4.38032",
+                "7b0eeaae.184c74",
+                "3eb365de.90f67a"
+            ]
+        ]
+    },
+    {
+        "id": "f436c608.ded538",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo temperatura",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 307,
+        "y": 182,
+        "wires": [
+            [
+                "4080bcd5.4de454"
+            ]
+        ]
+    },
+    {
+        "id": "ab5a33b4.38032",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima temperatura",
+        "format": "{{msg.payload[0].Tmax | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 960.2215881347656,
+        "y": 82.40348625183105,
+        "wires": []
+    },
+    {
+        "id": "7b0eeaae.184c74",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima temperatura",
+        "format": "{{msg.payload[0].Tmin | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 959.2215881347656,
+        "y": 120.40345191955566,
+        "wires": []
+    },
+    {
+        "id": "3eb365de.90f67a",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos temperatura",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 965.2216033935547,
+        "y": 167.67629432678223,
+        "wires": []
+    },
+    {
+        "id": "4e16d018.08e49",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo humedad",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n]; \n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 292,
+        "y": 250,
+        "wires": [
+            [
+                "93f03f64.d6572"
+            ]
+        ]
+    },
+    {
+        "id": "6fd3dc3f.7ccf84",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo nivel agua",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 435,
+        "wires": [
+            [
+                "4bfab370.66614c"
+            ]
+        ]
+    },
+    {
+        "id": "93f03f64.d6572",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 604,
+        "y": 251,
+        "wires": [
+            [
+                "b05bfcd0.f1dd9",
+                "2eaeff3.94d07",
+                "ae0d5a26.a78d88",
+                "c8b139a.2d0b8c8"
+            ]
+        ]
+    },
+    {
+        "id": "4bfab370.66614c",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 611,
+        "y": 437,
+        "wires": [
+            [
+                "1e46c37a.63703d",
+                "b493b14d.083de",
+                "f3c0feb2.37f28",
+                "65585844.b10ff8"
+            ]
+        ]
+    },
+    {
+        "id": "b05bfcd0.f1dd9",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media humedad",
+        "format": "{{msg.payload[0].Hmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 937,
+        "y": 226,
+        "wires": []
+    },
+    {
+        "id": "2eaeff3.94d07",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima humedad",
+        "format": "{{msg.payload[0].Hmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 941.2215881347656,
+        "y": 265.40348625183105,
+        "wires": []
+    },
+    {
+        "id": "ae0d5a26.a78d88",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 10,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima humedad",
+        "format": "{{msg.payload[0].Hmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 940.2215881347656,
+        "y": 303.40345191955566,
+        "wires": []
+    },
+    {
+        "id": "c8b139a.2d0b8c8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos humedad",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 949.2216186523438,
+        "y": 347.67626953125,
+        "wires": []
+    },
+    {
+        "id": "1e46c37a.63703d",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 13,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media nivel agua",
+        "format": "{{msg.payload[0].Nmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 940,
+        "y": 416,
+        "wires": []
+    },
+    {
+        "id": "b493b14d.083de",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máximo nivel agua",
+        "format": "{{msg.payload[0].Nmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 934.2215881347656,
+        "y": 455.40348625183105,
+        "wires": []
+    },
+    {
+        "id": "f3c0feb2.37f28",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 15,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínimo nivel agua",
+        "format": "{{msg.payload[0].Nmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 933.2215881347656,
+        "y": 493.40345191955566,
+        "wires": []
+    },
+    {
+        "id": "65585844.b10ff8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "b65b8ba5.aced58",
+        "order": 16,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos nivel agua",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 942.2216186523438,
+        "y": 537.67626953125,
+        "wires": []
+    },
+    {
+        "id": "5747e384.66d45c",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por horas temperatura",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n  msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];  \n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 292,
+        "y": 621,
+        "wires": [
+            [
+                "d65e53c8.ad83d"
+            ]
+        ]
+    },
+    {
+        "id": "d65e53c8.ad83d",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 577,
+        "y": 626,
+        "wires": [
+            [
+                "143eb92b.3a54f7"
+            ]
+        ]
+    },
+    {
+        "id": "143eb92b.3a54f7",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"T.media\",\"T.max\",\"T.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 847,
+        "y": 618,
+        "wires": [
+            [
+                "452a22f9.97031c"
+            ]
+        ]
+    },
+    {
+        "id": "2d7a91df.06b97e",
+        "type": "inject",
+        "z": "db06b081.fe408",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 912,
+        "y": 667,
+        "wires": [
+            [
+                "452a22f9.97031c",
+                "8bc17045.3e576",
+                "5f85fbd2.a5a4c4"
+            ]
+        ]
+    },
+    {
+        "id": "452a22f9.97031c",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "b65b8ba5.aced58",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Temperaturas por hora",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "x": 1120,
+        "y": 618,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "62268815.89f788",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por horas humedad",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 272,
+        "y": 747,
+        "wires": [
+            [
+                "94e26d68.48c5b"
+            ]
+        ]
+    },
+    {
+        "id": "94e26d68.48c5b",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 582,
+        "y": 747,
+        "wires": [
+            [
+                "3d464597.c870fa"
+            ]
+        ]
+    },
+    {
+        "id": "3d464597.c870fa",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"H.media\",\"H.max\",\"H.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 872,
+        "y": 745,
+        "wires": [
+            [
+                "8bc17045.3e576"
+            ]
+        ]
+    },
+    {
+        "id": "8bc17045.3e576",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "b65b8ba5.aced58",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Humedades por hora",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1128,
+        "y": 743,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5f85fbd2.a5a4c4",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "b65b8ba5.aced58",
+        "order": 12,
+        "width": 0,
+        "height": 0,
+        "label": "Nivel agua por hora",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1120,
+        "y": 846,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "57e06f07.f13cd",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por horas nivel agua",
+        "func": "var ms_per_dia = 60000*60*24;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar ayer = new Date(now_ms-ms_per_dia);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": ayer } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" },\n            \"hour\": { \"$hour\": \"$date\" }\n            \n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n]; \n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 265,
+        "y": 860,
+        "wires": [
+            [
+                "2ce8ba49.ed6cb6"
+            ]
+        ]
+    },
+    {
+        "id": "2ce8ba49.ed6cb6",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 588,
+        "y": 856,
+        "wires": [
+            [
+                "930febd0.7af638"
+            ]
+        ]
+    },
+    {
+        "id": "930febd0.7af638",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"N.media\",\"N.max\",\"N.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 872,
+        "y": 852,
+        "wires": [
+            [
+                "5f85fbd2.a5a4c4"
+            ]
+        ]
+    },
+    {
+        "id": "3ae4c90a.cca9b6",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "a7152530.a75728",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Última semana",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 156,
+        "y": 1563.000114440918,
+        "wires": [
+            [
+                "f79d1c43.c73c8",
+                "5fdb1a8e.ed1ea4",
+                "cc0705bb.b0a3f8",
+                "45be3148.48482",
+                "5fca5dc1.4bef24",
+                "971f664d.812f18"
+            ]
+        ]
+    },
+    {
+        "id": "2219a318.c390bc",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 853.8958129882812,
+        "y": 1190,
+        "wires": [
+            [
+                "6896d62b.400ba8",
+                "ca9a678.bc39298",
+                "bfc46e0.7a0ce9",
+                "1a451e3b.07b552"
+            ]
+        ]
+    },
+    {
+        "id": "5fdb1a8e.ed1ea4",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo temperatura",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 557.8958129882812,
+        "y": 1190,
+        "wires": [
+            [
+                "2219a318.c390bc"
+            ]
+        ]
+    },
+    {
+        "id": "6896d62b.400ba8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media temperatura",
+        "format": "{{msg.payload[0].Tmedia | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1206.8958129882812,
+        "y": 1051,
+        "wires": []
+    },
+    {
+        "id": "ca9a678.bc39298",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima temperatura",
+        "format": "{{msg.payload[0].Tmax | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1211.1174011230469,
+        "y": 1090.403486251831,
+        "wires": []
+    },
+    {
+        "id": "bfc46e0.7a0ce9",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima temperatura",
+        "format": "{{msg.payload[0].Tmin | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1210.1174011230469,
+        "y": 1128.4034519195557,
+        "wires": []
+    },
+    {
+        "id": "1a451e3b.07b552",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos temperatura",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1216.117416381836,
+        "y": 1175.6762943267822,
+        "wires": []
+    },
+    {
+        "id": "cc0705bb.b0a3f8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo humedad",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n]; \n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 542.8957824707031,
+        "y": 1292.0000190734863,
+        "wires": [
+            [
+                "55485cde.4f6944"
+            ]
+        ]
+    },
+    {
+        "id": "f79d1c43.c73c8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo nivel agua",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 560.8958129882812,
+        "y": 1443,
+        "wires": [
+            [
+                "a552160f.68bdb8"
+            ]
+        ]
+    },
+    {
+        "id": "55485cde.4f6944",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 854.8957824707031,
+        "y": 1293.0000190734863,
+        "wires": [
+            [
+                "aad7d2b5.f0e8b",
+                "357ca1a.a0bac5e",
+                "23f24715.c024a8",
+                "db3c25b.1f0a4d8"
+            ]
+        ]
+    },
+    {
+        "id": "a552160f.68bdb8",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 861.8958129882812,
+        "y": 1445,
+        "wires": [
+            [
+                "aa436508.5bab58",
+                "9b735079.6bd6a",
+                "e600a7ae.7b1418",
+                "79e6fb.13e56904"
+            ]
+        ]
+    },
+    {
+        "id": "aad7d2b5.f0e8b",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media humedad",
+        "format": "{{msg.payload[0].Hmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1187.8958129882812,
+        "y": 1234,
+        "wires": []
+    },
+    {
+        "id": "357ca1a.a0bac5e",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima humedad",
+        "format": "{{msg.payload[0].Hmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1192.1174011230469,
+        "y": 1273.403486251831,
+        "wires": []
+    },
+    {
+        "id": "23f24715.c024a8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 10,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima humedad",
+        "format": "{{msg.payload[0].Hmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1191.1174011230469,
+        "y": 1311.4034519195557,
+        "wires": []
+    },
+    {
+        "id": "db3c25b.1f0a4d8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos humedad",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1200.117431640625,
+        "y": 1355.67626953125,
+        "wires": []
+    },
+    {
+        "id": "aa436508.5bab58",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 13,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media nivel agua",
+        "format": "{{msg.payload[0].Nmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1190.8958129882812,
+        "y": 1424,
+        "wires": []
+    },
+    {
+        "id": "9b735079.6bd6a",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máximo nivel agua",
+        "format": "{{msg.payload[0].Nmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1185.1174011230469,
+        "y": 1463.403486251831,
+        "wires": []
+    },
+    {
+        "id": "e600a7ae.7b1418",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 15,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínimo nivel agua",
+        "format": "{{msg.payload[0].Nmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1184.1174011230469,
+        "y": 1501.4034519195557,
+        "wires": []
+    },
+    {
+        "id": "79e6fb.13e56904",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "a7152530.a75728",
+        "order": 16,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos nivel agua",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1193.117431640625,
+        "y": 1545.67626953125,
+        "wires": []
+    },
+    {
+        "id": "45be3148.48482",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias semana temperatura",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 524.8958129882812,
+        "y": 1633.0000839233398,
+        "wires": [
+            [
+                "56e38c26.f20f44"
+            ]
+        ]
+    },
+    {
+        "id": "56e38c26.f20f44",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 827.8958129882812,
+        "y": 1634,
+        "wires": [
+            [
+                "cbf989b1.7c8148"
+            ]
+        ]
+    },
+    {
+        "id": "cbf989b1.7c8148",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"T.media\",\"T.max\",\"T.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1097.8958129882812,
+        "y": 1626,
+        "wires": [
+            [
+                "37c6aae9.952656"
+            ]
+        ]
+    },
+    {
+        "id": "8859742a.fe2488",
+        "type": "inject",
+        "z": "db06b081.fe408",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 1162.8958129882812,
+        "y": 1675,
+        "wires": [
+            [
+                "37c6aae9.952656"
+            ]
+        ]
+    },
+    {
+        "id": "37c6aae9.952656",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "a7152530.a75728",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Temperaturas por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1370.8958129882812,
+        "y": 1626,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5fca5dc1.4bef24",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias semana humedad",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n            \n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n            \n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n]; \n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 542.8958129882812,
+        "y": 1755,
+        "wires": [
+            [
+                "36a2ecbe.25bc14"
+            ]
+        ]
+    },
+    {
+        "id": "36a2ecbe.25bc14",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 832.8958129882812,
+        "y": 1755,
+        "wires": [
+            [
+                "61385a11.408744"
+            ]
+        ]
+    },
+    {
+        "id": "61385a11.408744",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"H.media\",\"H.max\",\"H.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1122.8958129882812,
+        "y": 1753,
+        "wires": [
+            [
+                "7d4d7856.327cd8"
+            ]
+        ]
+    },
+    {
+        "id": "7d4d7856.327cd8",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "a7152530.a75728",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Humedades por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1368.8957748413086,
+        "y": 1755.9999170303345,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "ccde61a1.89bd2",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "a7152530.a75728",
+        "order": 12,
+        "width": 0,
+        "height": 0,
+        "label": "Nivel agua por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1374.8958282470703,
+        "y": 1860.0000038146973,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "971f664d.812f18",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias semana nivel agua",
+        "func": "var ms_per_week = 60000*60*24*7;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar sem = new Date(now_ms-ms_per_week);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n            \n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": sem } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n            \n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 535.8958129882812,
+        "y": 1868,
+        "wires": [
+            [
+                "49686626.092fa8"
+            ]
+        ]
+    },
+    {
+        "id": "49686626.092fa8",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 838.8958129882812,
+        "y": 1864,
+        "wires": [
+            [
+                "8f8058a4.5eef68"
+            ]
+        ]
+    },
+    {
+        "id": "8f8058a4.5eef68",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"N.media\",\"N.max\",\"N.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1122.8958129882812,
+        "y": 1860,
+        "wires": [
+            [
+                "ccde61a1.89bd2"
+            ]
+        ]
+    },
+    {
+        "id": "7d2d5978.0cdbe8",
+        "type": "ui_dropdown",
+        "z": "db06b081.fe408",
+        "name": "",
+        "label": "Selector usuario",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "9a510b68.c12b88",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "TODOS",
+                "value": "ESP0",
+                "type": "str"
+            },
+            {
+                "label": "PACO",
+                "value": "ESP1126067",
+                "type": "str"
+            },
+            {
+                "label": "PABLO",
+                "value": "ESP833295",
+                "type": "str"
+            },
+            {
+                "label": "SERGIO",
+                "value": "ESP5821794",
+                "type": "str"
+            },
+            {
+                "label": "ADRI",
+                "value": "ESP1089673",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 112.89588928222656,
+        "y": 68.88888549804688,
+        "wires": [
+            [
+                "3b2b0793.d1d308"
+            ]
+        ]
+    },
+    {
+        "id": "3b2b0793.d1d308",
+        "type": "change",
+        "z": "db06b081.fe408",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "usuario",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 324.89588928222656,
+        "y": 69.88888549804688,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "31e45cf0.925da4",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "4650aef6.e2eba",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Último mes",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 113.00001525878906,
+        "y": 2566.111396789551,
+        "wires": [
+            [
+                "ffbc2dcc.49ab1",
+                "3fa78e9e.1be112",
+                "434884ad.e5532c",
+                "23e946c3.e1e7ba",
+                "cc1c5d7f.c429b",
+                "6d7ddd29.b2d0b4"
+            ]
+        ]
+    },
+    {
+        "id": "287cce46.3ea3d2",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 807.8958129882812,
+        "y": 2159.111410140991,
+        "wires": [
+            [
+                "98bbbbd.8cdc148",
+                "f564c006.b0f61",
+                "5b713f4f.e1043",
+                "2a7b4d09.b34f62"
+            ]
+        ]
+    },
+    {
+        "id": "ffbc2dcc.49ab1",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo temperatura",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 511.89581298828125,
+        "y": 2159.111410140991,
+        "wires": [
+            [
+                "287cce46.3ea3d2"
+            ]
+        ]
+    },
+    {
+        "id": "98bbbbd.8cdc148",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media temperatura",
+        "format": "{{msg.payload[0].Tmedia | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1160.8958129882812,
+        "y": 2020.1114101409912,
+        "wires": []
+    },
+    {
+        "id": "f564c006.b0f61",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima temperatura",
+        "format": "{{msg.payload[0].Tmax | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1165.1174011230469,
+        "y": 2059.5148963928223,
+        "wires": []
+    },
+    {
+        "id": "5b713f4f.e1043",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima temperatura",
+        "format": "{{msg.payload[0].Tmin | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1164.1174011230469,
+        "y": 2097.514862060547,
+        "wires": []
+    },
+    {
+        "id": "2a7b4d09.b34f62",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos temperatura",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1170.117416381836,
+        "y": 2144.7877044677734,
+        "wires": []
+    },
+    {
+        "id": "3fa78e9e.1be112",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo humedad",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n   msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n]; \n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 503.89583587646484,
+        "y": 2264.1113300323486,
+        "wires": [
+            [
+                "3cd23881.3d4768"
+            ]
+        ]
+    },
+    {
+        "id": "434884ad.e5532c",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo nivel agua",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 507.8958282470703,
+        "y": 2446.111261367798,
+        "wires": [
+            [
+                "63c0fe39.513aa"
+            ]
+        ]
+    },
+    {
+        "id": "3cd23881.3d4768",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 801.8958282470703,
+        "y": 2262.111261367798,
+        "wires": [
+            [
+                "dfae99f4.f1ebf8",
+                "d0d737ed.85b648",
+                "51fa20bd.b5183",
+                "c6b5688f.69c948"
+            ]
+        ]
+    },
+    {
+        "id": "63c0fe39.513aa",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 808.8958282470703,
+        "y": 2448.111261367798,
+        "wires": [
+            [
+                "7627b1c3.5b3d1",
+                "989bfc50.7a5e9",
+                "963bb0f1.78d88",
+                "d4503fb6.0c988"
+            ]
+        ]
+    },
+    {
+        "id": "dfae99f4.f1ebf8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media humedad",
+        "format": "{{msg.payload[0].Hmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1134.8958282470703,
+        "y": 2237.111261367798,
+        "wires": []
+    },
+    {
+        "id": "d0d737ed.85b648",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima humedad",
+        "format": "{{msg.payload[0].Hmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1139.117416381836,
+        "y": 2276.514747619629,
+        "wires": []
+    },
+    {
+        "id": "51fa20bd.b5183",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 10,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima humedad",
+        "format": "{{msg.payload[0].Hmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1138.117416381836,
+        "y": 2314.5147132873535,
+        "wires": []
+    },
+    {
+        "id": "c6b5688f.69c948",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos humedad",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1147.117446899414,
+        "y": 2358.787530899048,
+        "wires": []
+    },
+    {
+        "id": "7627b1c3.5b3d1",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 13,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media nivel agua",
+        "format": "{{msg.payload[0].Nmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1137.8958282470703,
+        "y": 2427.111261367798,
+        "wires": []
+    },
+    {
+        "id": "989bfc50.7a5e9",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máximo nivel agua",
+        "format": "{{msg.payload[0].Nmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1132.117416381836,
+        "y": 2466.514747619629,
+        "wires": []
+    },
+    {
+        "id": "963bb0f1.78d88",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 15,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínimo nivel agua",
+        "format": "{{msg.payload[0].Nmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1131.117416381836,
+        "y": 2504.5147132873535,
+        "wires": []
+    },
+    {
+        "id": "d4503fb6.0c988",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "4650aef6.e2eba",
+        "order": 16,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datosnivel agua",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1140.117446899414,
+        "y": 2548.787530899048,
+        "wires": []
+    },
+    {
+        "id": "23e946c3.e1e7ba",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias mes temperatura",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 474.8957977294922,
+        "y": 2637.1112842559814,
+        "wires": [
+            [
+                "ea3ede3b.257a5"
+            ]
+        ]
+    },
+    {
+        "id": "ea3ede3b.257a5",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 774.8958282470703,
+        "y": 2637.111261367798,
+        "wires": [
+            [
+                "1effd9af.314b26"
+            ]
+        ]
+    },
+    {
+        "id": "1effd9af.314b26",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"T.media\",\"T.max\",\"T.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1044.8958282470703,
+        "y": 2629.111261367798,
+        "wires": [
+            [
+                "205dc4db.37135c"
+            ]
+        ]
+    },
+    {
+        "id": "5389834f.3e73ec",
+        "type": "inject",
+        "z": "db06b081.fe408",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 1109.8958282470703,
+        "y": 2678.111261367798,
+        "wires": [
+            [
+                "205dc4db.37135c"
+            ]
+        ]
+    },
+    {
+        "id": "205dc4db.37135c",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "4650aef6.e2eba",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Temperaturas por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1317.8958282470703,
+        "y": 2629.111261367798,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "cc1c5d7f.c429b",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias humedad",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 459.8958282470703,
+        "y": 2758.111261367798,
+        "wires": [
+            [
+                "e8465208.27352"
+            ]
+        ]
+    },
+    {
+        "id": "e8465208.27352",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 779.8958282470703,
+        "y": 2758.111261367798,
+        "wires": [
+            [
+                "ff3ad1b6.c25ed"
+            ]
+        ]
+    },
+    {
+        "id": "ff3ad1b6.c25ed",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"H.media\",\"H.max\",\"H.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1069.8958282470703,
+        "y": 2756.111261367798,
+        "wires": [
+            [
+                "4f072cb1.a841e4"
+            ]
+        ]
+    },
+    {
+        "id": "4f072cb1.a841e4",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "4650aef6.e2eba",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Humedades por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1315.8957901000977,
+        "y": 2759.1111783981323,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b6eaaa0d.f73358",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "4650aef6.e2eba",
+        "order": 12,
+        "width": 0,
+        "height": 0,
+        "label": "Nivel agua por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1321.8958435058594,
+        "y": 2863.111265182495,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6d7ddd29.b2d0b4",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por dias nivel agua",
+        "func": "var ms_per_month = 60000*60*24*30;\n\n// Obtenemos el timestamp actual\nvar now_ms = new Date().getTime();\n\n// Creamos un objeto con la hora de hace 24h\nvar mes = new Date(now_ms-ms_per_month);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nelse\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": mes } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 462.8958282470703,
+        "y": 2871.111261367798,
+        "wires": [
+            [
+                "dc7a340f.fde3b8"
+            ]
+        ]
+    },
+    {
+        "id": "dc7a340f.fde3b8",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 785.8958282470703,
+        "y": 2867.111261367798,
+        "wires": [
+            [
+                "a5329a28.c524d8"
+            ]
+        ]
+    },
+    {
+        "id": "a5329a28.c524d8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"N.media\",\"N.max\",\"N.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1069.8958282470703,
+        "y": 2863.111261367798,
+        "wires": [
+            [
+                "b6eaaa0d.f73358"
+            ]
+        ]
+    },
+    {
+        "id": "78c3ee03.9e356",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "26d4ddf6.835812",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Por rango de fechas",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 115.99998474121094,
+        "y": 3670.222499847412,
+        "wires": [
+            [
+                "c52b4784.2f21d8",
+                "54a83368.fd08cc",
+                "539e8b84.e7d0e4",
+                "e97ddddc.ad4f9",
+                "24c2572.5c109a8",
+                "fbfd0c21.9d051"
+            ]
+        ]
+    },
+    {
+        "id": "6afc036e.af373c",
+        "type": "ui_date_picker",
+        "z": "db06b081.fe408",
+        "name": "",
+        "label": "Fecha inicio",
+        "group": "9a510b68.c12b88",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 117.67360305786133,
+        "y": 2971.333547592163,
+        "wires": [
+            [
+                "9f05bfe.d8fff4"
+            ]
+        ]
+    },
+    {
+        "id": "9dfd5b1f.e78188",
+        "type": "ui_date_picker",
+        "z": "db06b081.fe408",
+        "name": "",
+        "label": "Fecha final",
+        "group": "9a510b68.c12b88",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 115.67360305786133,
+        "y": 3040.333547592163,
+        "wires": [
+            [
+                "217abf6b.ce705"
+            ]
+        ]
+    },
+    {
+        "id": "9f05bfe.d8fff4",
+        "type": "change",
+        "z": "db06b081.fe408",
+        "name": "desde",
+        "rules": [
+            {
+                "t": "set",
+                "p": "desde",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 273.6736030578613,
+        "y": 2971.333547592163,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "217abf6b.ce705",
+        "type": "change",
+        "z": "db06b081.fe408",
+        "name": "hasta",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hasta",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 276.6736030578613,
+        "y": 3039.333547592163,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "25abdc1b.1cada4",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 853.6735916137695,
+        "y": 3198.3339805603027,
+        "wires": [
+            [
+                "c8c6c51c.87d3f8",
+                "991a62b3.be549",
+                "250de0ea.7dd13",
+                "ef386ea6.702d8"
+            ]
+        ]
+    },
+    {
+        "id": "c52b4784.2f21d8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo fecha temp",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 544.6735992431641,
+        "y": 3191.667152404785,
+        "wires": [
+            [
+                "25abdc1b.1cada4"
+            ]
+        ]
+    },
+    {
+        "id": "54a83368.fd08cc",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo fecha hum",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 532.8957977294922,
+        "y": 3389.4450187683105,
+        "wires": [
+            [
+                "89aff6e0.b396a8"
+            ]
+        ]
+    },
+    {
+        "id": "539e8b84.e7d0e4",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega todo fecha nivAgua",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"nivel_agua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": 0,\n        \"Nmedia\":{\"$avg\":\"$nivel_agua\"},\n        \"Nmax\":  {\"$max\":\"$nivel_agua\"},\n        \"Nmin\":  {\"$min\":\"$nivel_agua\"},\n        \"datos\": {\"$sum\":1}\n    }}\n];\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 545.8958282470703,
+        "y": 3592.4446716308594,
+        "wires": [
+            [
+                "8d986e00.07c3f"
+            ]
+        ]
+    },
+    {
+        "id": "e97ddddc.ad4f9",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha temp",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"temperatura\": \"$DHT11.Temperatura\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Tmedia\":{\"$avg\":\"$temperatura\"},\n        \"Tmax\":  {\"$max\":\"$temperatura\"},\n        \"Tmin\":  {\"$min\":\"$temperatura\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 551.8957290649414,
+        "y": 3757.333448410034,
+        "wires": [
+            [
+                "19d7903c.a63aa"
+            ]
+        ]
+    },
+    {
+        "id": "24c2572.5c109a8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha hum",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\n\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"humedad\": \"$DHT11.Humedad\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Hmedia\":{\"$avg\":\"$humedad\"},\n        \"Hmax\":  {\"$max\":\"$humedad\"},\n        \"Hmin\":  {\"$min\":\"$humedad\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 519.8957290649414,
+        "y": 3890.333643436432,
+        "wires": [
+            [
+                "4e99dbb6.5e3ec4"
+            ]
+        ]
+    },
+    {
+        "id": "fbfd0c21.9d051",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha NivAgua",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n}\n\nelse \n{\nmsg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"NivelAgua\": \"$NivelAgua\"\n        }\n    },\n    { \"$group\": {\n        \"_id\": { \n        \"$dateFromParts\" : {\n            \"year\": { \"$year\": \"$date\" }, \n            \"month\": { \"$month\": \"$date\" },\n            \"day\": { \"$dayOfMonth\": \"$date\" }\n        }},\n\n        \"Nmedia\":{\"$avg\":\"$NivelAgua\"},\n        \"Nmax\":  {\"$max\":\"$NivelAgua\"},\n        \"Nmin\":  {\"$min\":\"$NivelAgua\"},\n        \"datos\": {\"$sum\":1},\n    }},\n    { \"$sort\": {\"_id\": 1} }\n];\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 513.8957061767578,
+        "y": 3994.3341102600098,
+        "wires": [
+            [
+                "87770bf.69a98f8"
+            ]
+        ]
+    },
+    {
+        "id": "89aff6e0.b396a8",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 848.8958129882812,
+        "y": 3379.1112747192383,
+        "wires": [
+            [
+                "f7a0207b.33f6",
+                "2b349468.2e78fc",
+                "c1ca823a.fae64",
+                "42057952.b42f08"
+            ]
+        ]
+    },
+    {
+        "id": "8d986e00.07c3f",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 839.8958358764648,
+        "y": 3587.1111154556274,
+        "wires": [
+            [
+                "c8967096.eafda",
+                "61adbdd7.1c3514",
+                "8bd8a446.3aa258",
+                "e1a05617.c8d4d8"
+            ]
+        ]
+    },
+    {
+        "id": "19d7903c.a63aa",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 807.8957290649414,
+        "y": 3762.111036300659,
+        "wires": [
+            [
+                "e2b89f11.9df7e"
+            ]
+        ]
+    },
+    {
+        "id": "4e99dbb6.5e3ec4",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 784.8957138061523,
+        "y": 3890.1112265586853,
+        "wires": [
+            [
+                "2ebbd562.28a36a"
+            ]
+        ]
+    },
+    {
+        "id": "87770bf.69a98f8",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "datos",
+        "operation": "aggregate",
+        "x": 810.8956604003906,
+        "y": 3993.1114540100098,
+        "wires": [
+            [
+                "dd9a1027.bb295"
+            ]
+        ]
+    },
+    {
+        "id": "c8c6c51c.87d3f8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media temperatura",
+        "format": "{{msg.payload[0].Tmedia | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1250.8958740234375,
+        "y": 3129.77783203125,
+        "wires": []
+    },
+    {
+        "id": "991a62b3.be549",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima temperatura",
+        "format": "{{msg.payload[0].Tmax | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1255.1174621582031,
+        "y": 3169.181318283081,
+        "wires": []
+    },
+    {
+        "id": "250de0ea.7dd13",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima temperatura",
+        "format": "{{msg.payload[0].Tmin | number:1 }}ºC",
+        "layout": "row-left",
+        "x": 1254.1174621582031,
+        "y": 3207.1812839508057,
+        "wires": []
+    },
+    {
+        "id": "ef386ea6.702d8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos temperatura",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1260.1174774169922,
+        "y": 3254.454126358032,
+        "wires": []
+    },
+    {
+        "id": "f7a0207b.33f6",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media humedad",
+        "format": "{{msg.payload[0].Hmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1222.8958892822266,
+        "y": 3321.77787399292,
+        "wires": []
+    },
+    {
+        "id": "2b349468.2e78fc",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máxima humedad",
+        "format": "{{msg.payload[0].Hmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1227.1174774169922,
+        "y": 3361.181360244751,
+        "wires": []
+    },
+    {
+        "id": "c1ca823a.fae64",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 10,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínima humedad",
+        "format": "{{msg.payload[0].Hmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1226.1174774169922,
+        "y": 3399.1813259124756,
+        "wires": []
+    },
+    {
+        "id": "42057952.b42f08",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos humedad",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1235.1175079345703,
+        "y": 3443.45414352417,
+        "wires": []
+    },
+    {
+        "id": "c8967096.eafda",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 13,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media nivel agua",
+        "format": "{{msg.payload[0].Nmedia | number:1 }}%",
+        "layout": "row-left",
+        "x": 1227.8958892822266,
+        "y": 3536.7776832580566,
+        "wires": []
+    },
+    {
+        "id": "61adbdd7.1c3514",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Máximo nivel agua",
+        "format": "{{msg.payload[0].Nmax | number:1 }}%",
+        "layout": "row-left",
+        "x": 1222.1174774169922,
+        "y": 3576.1811695098877,
+        "wires": []
+    },
+    {
+        "id": "8bd8a446.3aa258",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 15,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Mínimo nivel agua",
+        "format": "{{msg.payload[0].Nmin | number:1 }}%",
+        "layout": "row-left",
+        "x": 1221.1174774169922,
+        "y": 3614.1811351776123,
+        "wires": []
+    },
+    {
+        "id": "e1a05617.c8d4d8",
+        "type": "ui_text",
+        "z": "db06b081.fe408",
+        "group": "26d4ddf6.835812",
+        "order": 16,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nº datos nivel agua",
+        "format": "{{msg.payload[0].datos }} muestras",
+        "layout": "row-left",
+        "x": 1230.1175079345703,
+        "y": 3658.4539527893066,
+        "wires": []
+    },
+    {
+        "id": "e2b89f11.9df7e",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Tmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"T.media\",\"T.max\",\"T.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1115.8958740234375,
+        "y": 3760.77783203125,
+        "wires": [
+            [
+                "4aca0fa.4c814f"
+            ]
+        ]
+    },
+    {
+        "id": "9abc9533.adfe68",
+        "type": "inject",
+        "z": "db06b081.fe408",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 1180.8958740234375,
+        "y": 3809.77783203125,
+        "wires": [
+            [
+                "4aca0fa.4c814f"
+            ]
+        ]
+    },
+    {
+        "id": "4aca0fa.4c814f",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "26d4ddf6.835812",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Temperaturas por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1388.8958740234375,
+        "y": 3760.77783203125,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2ebbd562.28a36a",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Hmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"H.media\",\"H.max\",\"H.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1140.8958740234375,
+        "y": 3887.77783203125,
+        "wires": [
+            [
+                "9dadc56f.d79e18"
+            ]
+        ]
+    },
+    {
+        "id": "9dadc56f.d79e18",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "26d4ddf6.835812",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Humedades por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1386.8958358764648,
+        "y": 3890.7777490615845,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "53fbd3c2.8738ec",
+        "type": "ui_chart",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "26d4ddf6.835812",
+        "order": 12,
+        "width": 0,
+        "height": 0,
+        "label": "Nivel agua por día",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "D/M",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#008000",
+            "#ff0000",
+            "#0080ff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 2,
+        "x": 1392.8958892822266,
+        "y": 3994.7778358459473,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "dd9a1027.bb295",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "genera datos gráfica",
+        "func": "var arrayavg=[];\nvar arraymax=[];\nvar arraymin=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arrayavg.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmedia});\n        arraymax.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmax});\n        arraymin.push({x : msg.payload[i]._id.getTime() , y : msg.payload[i].Nmin});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"N.media\",\"N.max\",\"N.min\"],\n        \"data\":[arrayavg, arraymax, arraymin],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1140.8958740234375,
+        "y": 3994.77783203125,
+        "wires": [
+            [
+                "53fbd3c2.8738ec"
+            ]
+        ]
+    },
+    {
+        "id": "2aa8c54a.67da8a",
+        "type": "template",
+        "z": "db06b081.fe408",
+        "name": "lista led en formato html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": " <h1>Registros LED: </h1>\n <ul>\n{{#payload}}\n  <li>{{date}} : {{chipid}}, {{nivel_led}}, {{origen}} </li>\n{{/payload}}\n </ul>",
+        "output": "str",
+        "x": 1030.8959197998047,
+        "y": 4128.223174095154,
+        "wires": [
+            [
+                "6cf36938.169c28"
+            ]
+        ]
+    },
+    {
+        "id": "6cf36938.169c28",
+        "type": "ui_template",
+        "z": "db06b081.fe408",
+        "group": "312982a4.2a5a4e",
+        "name": "Lista consulta led",
+        "order": 4,
+        "width": "6",
+        "height": "4",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1277.7921752929688,
+        "y": 4125.112557411194,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d187637.2ada78",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "led",
+        "operation": "aggregate",
+        "x": 760.8958587646484,
+        "y": 4125.333640098572,
+        "wires": [
+            [
+                "2aa8c54a.67da8a"
+            ]
+        ]
+    },
+    {
+        "id": "815d0f61.eab3f",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "switch",
+        "operation": "aggregate",
+        "x": 770.4515075683594,
+        "y": 4251.222381591797,
+        "wires": [
+            [
+                "54e53686.630578"
+            ]
+        ]
+    },
+    {
+        "id": "d8491208.3fc1a",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "conexion",
+        "operation": "aggregate",
+        "x": 816.4515533447266,
+        "y": 4398.666615486145,
+        "wires": [
+            [
+                "c5919c03.b9e4d"
+            ]
+        ]
+    },
+    {
+        "id": "d33d2b14.7ef858",
+        "type": "mongodb in",
+        "z": "db06b081.fe408",
+        "mongodb": "89698702.33e128",
+        "name": "",
+        "collection": "errores",
+        "operation": "aggregate",
+        "x": 812.0002746582031,
+        "y": 4501.666728973389,
+        "wires": [
+            [
+                "85c06bed.669348"
+            ]
+        ]
+    },
+    {
+        "id": "6e1ae2cb.6fa1cc",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha descarga led",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"nivel_led\": \"$led\",\n        \"origen\": \"$origen\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"nivel_led\": \"$led\",\n        \"origen\": \"$origen\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 471.89585876464844,
+        "y": 4122.111859321594,
+        "wires": [
+            [
+                "5d187637.2ada78"
+            ]
+        ]
+    },
+    {
+        "id": "dca1af22.7609e",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha switch",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"switch\": \"$Switch\",\n        \"origen\": \"$origen\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"chipid\": \"$CHIPID\",\n        \"switch\": \"$Switch\",\n        \"origen\": \"$origen\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 465.89585876464844,
+        "y": 4253.222272872925,
+        "wires": [
+            [
+                "815d0f61.eab3f"
+            ]
+        ]
+    },
+    {
+        "id": "c1b3a929.6b99d8",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha conexion",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"conexion\": \"$online\",\n        \"chipid\": \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"conexion\": \"$online\",\n        \"chipid\": \"$CHIPID\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 471.89585876464844,
+        "y": 4397.667158126831,
+        "wires": [
+            [
+                "d8491208.3fc1a"
+            ]
+        ]
+    },
+    {
+        "id": "1349621d.a38bee",
+        "type": "function",
+        "z": "db06b081.fe408",
+        "name": "agrega por fecha errores",
+        "func": "// fecha por defecto es hoy\nvar ahora = new Date();\n// pillo los globales si los hay, si no la fecha de hoy\nvar desde = new Date(global.get(\"desde\") || ahora);\nvar hasta = new Date(global.get(\"hasta\") || ahora); \n// el día de inicio desde las cero horas\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),1,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),24,59,59,99);\n\nvar usuario = global.get(\"usuario\");\n\nif (usuario==\"ESP0\")\n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$project\": {\n        \"date\": 1,\n        \"error_Temperatura\": \"$errorTemp\",\n        \"error_Humedad\": \"$errorHum\",\n        \"error_Nivel_Agua\": \"$errorNivelAgua\",\n        \"chipid\": \"$CHIPID\"\n        }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n}\nelse \n{\n    msg.payload=\n[\n    { \"$match\": { \"date\": { \"$gte\": inicio , \"$lte\": final } } },\n    { \"$match\": { \"CHIPID\": usuario } },\n    { \"$project\": {\n        \"date\": 1,\n        \"error_Temperatura\": \"$errorTemp\",\n        \"error_Humedad\": \"$errorHum\",\n        \"error_Nivel_Agua\": \"$errorNivelAgua\",\n        \"chipid\": \"$CHIPID\"\n    }\n    },\n    { \"$sort\": {\"date\": 1} }\n];\n\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 466.4445495605469,
+        "y": 4498.667325973511,
+        "wires": [
+            [
+                "d33d2b14.7ef858"
+            ]
+        ]
+    },
+    {
+        "id": "60d0d164.f4158",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "312982a4.2a5a4e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Consulta led por fechas",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 153.8958282470703,
+        "y": 4123.000535964966,
+        "wires": [
+            [
+                "6e1ae2cb.6fa1cc"
+            ]
+        ]
+    },
+    {
+        "id": "72c9a203.2d87ac",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "25015a66.d31c26",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Consulta switch por fechas",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 164.8958282470703,
+        "y": 4251.111921310425,
+        "wires": [
+            [
+                "dca1af22.7609e"
+            ]
+        ]
+    },
+    {
+        "id": "154d880f.949768",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "3bb4405f.fd70c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Consulta conexion por fechas",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 139.8958282470703,
+        "y": 4397.111438751221,
+        "wires": [
+            [
+                "c1b3a929.6b99d8"
+            ]
+        ]
+    },
+    {
+        "id": "37340ca.eb3ebf4",
+        "type": "ui_button",
+        "z": "db06b081.fe408",
+        "name": "",
+        "group": "5a6b1a8a.61b4a4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Consulta errores por fechas",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "num",
+        "topic": "",
+        "x": 150.8958282470703,
+        "y": 4498.111499786377,
+        "wires": [
+            [
+                "1349621d.a38bee"
+            ]
+        ]
+    },
+    {
+        "id": "54e53686.630578",
+        "type": "template",
+        "z": "db06b081.fe408",
+        "name": "lista switch en formato html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": " <h1>Registros switch: </h1>\n <ul>\n{{#payload}}\n  <li>{{date}} : {{chipid}}, {{switch}}, {{origen}} </li>\n{{/payload}}\n </ul>",
+        "output": "str",
+        "x": 1069.8958740234375,
+        "y": 4249.111328125,
+        "wires": [
+            [
+                "90cb738f.2990c"
+            ]
+        ]
+    },
+    {
+        "id": "90cb738f.2990c",
+        "type": "ui_template",
+        "z": "db06b081.fe408",
+        "group": "25015a66.d31c26",
+        "name": "Lista consulta switch",
+        "order": 4,
+        "width": "6",
+        "height": "4",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1313.8959922790527,
+        "y": 4249.1119747161865,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c5919c03.b9e4d",
+        "type": "template",
+        "z": "db06b081.fe408",
+        "name": "lista conexion en formato html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": " <h1>Registros conexion: </h1>\n <ul>\n{{#payload}}\n  <li>{{date}} : {{conexion}}, {{chipid}} </li>\n{{/payload}}\n </ul>",
+        "output": "str",
+        "x": 1115.8959426879883,
+        "y": 4399.111490249634,
+        "wires": [
+            [
+                "b627e7c7.441db8"
+            ]
+        ]
+    },
+    {
+        "id": "b627e7c7.441db8",
+        "type": "ui_template",
+        "z": "db06b081.fe408",
+        "group": "3bb4405f.fd70c",
+        "name": "Lista consulta conexion",
+        "order": 4,
+        "width": "6",
+        "height": "4",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1386.8959922790527,
+        "y": 4399.1119747161865,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "85c06bed.669348",
+        "type": "template",
+        "z": "db06b081.fe408",
+        "name": "lista errores en formato html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": " <h1>Registros errores: </h1>\n <ul>\n{{#payload}}\n  <li>{{date}} : Error temp = {{error_Temperatura}}, Error hum = {{error_Humedad}}, Error NivelAgua = {{error_Nivel_Agua}}, {{chipid}} </li>\n{{/payload}}\n </ul>",
+        "output": "str",
+        "x": 1115.8960342407227,
+        "y": 4499.111983299255,
+        "wires": [
+            [
+                "e09d2da7.14d38"
+            ]
+        ]
+    },
+    {
+        "id": "e09d2da7.14d38",
+        "type": "ui_template",
+        "z": "db06b081.fe408",
+        "group": "5a6b1a8a.61b4a4",
+        "name": "Lista consulta errores",
+        "order": 4,
+        "width": "6",
+        "height": "4",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1389.8959674835205,
+        "y": 4503.111661911011,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b65b8ba5.aced58",
+        "type": "ui_group",
+        "name": "Último día",
+        "tab": "9a181ff7.f4d39",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "89698702.33e128",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "II8",
+        "name": ""
+    },
+    {
+        "id": "a7152530.a75728",
+        "type": "ui_group",
+        "name": "Última semana",
+        "tab": "9a181ff7.f4d39",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "9a510b68.c12b88",
+        "type": "ui_group",
+        "name": "Selector",
+        "tab": "9a181ff7.f4d39",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "4650aef6.e2eba",
+        "type": "ui_group",
+        "name": "Ultimo mes",
+        "tab": "9a181ff7.f4d39",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "26d4ddf6.835812",
+        "type": "ui_group",
+        "name": "Rango fechas",
+        "tab": "9a181ff7.f4d39",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "312982a4.2a5a4e",
+        "type": "ui_group",
+        "name": "Consulta historial LED",
+        "tab": "9a181ff7.f4d39",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "25015a66.d31c26",
+        "type": "ui_group",
+        "name": "Consulta historial switch",
+        "tab": "9a181ff7.f4d39",
+        "order": 7,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "3bb4405f.fd70c",
+        "type": "ui_group",
+        "name": "Consulta historial conexion",
+        "tab": "9a181ff7.f4d39",
+        "order": 8,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "5a6b1a8a.61b4a4",
+        "type": "ui_group",
+        "name": "Consulta historial errores",
+        "tab": "9a181ff7.f4d39",
+        "order": 9,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "9a181ff7.f4d39",
+        "type": "ui_tab",
+        "name": "Consultas",
+        "icon": "dashboard",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    }
+]

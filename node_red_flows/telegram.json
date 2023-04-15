@@ -1,0 +1,1300 @@
+[
+    {
+        "id": "693561c.6c425a",
+        "type": "tab",
+        "label": "Telegram",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "ae77781.2595488",
+        "type": "inject",
+        "z": "693561c.6c425a",
+        "name": "start flow",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 440,
+        "wires": [
+            [
+                "a3e095d7.cea038"
+            ]
+        ]
+    },
+    {
+        "id": "a3e095d7.cea038",
+        "type": "http request",
+        "z": "693561c.6c425a",
+        "name": "AEMET http request",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://www.aemet.es/xml/municipios/localidad_29067.xml",
+        "tls": "",
+        "x": 490.99999237060547,
+        "y": 439.00000190734863,
+        "wires": [
+            [
+                "1b3a552.6673aab"
+            ]
+        ]
+    },
+    {
+        "id": "1b3a552.6673aab",
+        "type": "xml",
+        "z": "693561c.6c425a",
+        "name": "",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 674.9999923706055,
+        "y": 439.00000190734863,
+        "wires": [
+            [
+                "3a866d32.6f92c2",
+                "4ea3ec7a.0afb74"
+            ]
+        ]
+    },
+    {
+        "id": "3a866d32.6f92c2",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "whole xml",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 917,
+        "y": 397.99999618530273,
+        "wires": []
+    },
+    {
+        "id": "1af2ba44.73eca6",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "ID debug",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 616,
+        "y": 396.99999618530273,
+        "wires": []
+    },
+    {
+        "id": "68fda091.a9d21",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "",
+        "func": "if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \"+msg.originalMessage.from.first_name+\" soy un bot ejecutando en NodeRED. Puedo responderte a estos comandos:\\n\";\n msg.payload.content+=\"/tiempo --> Para ver el tiempo de malaga\\n\";\n  msg.payload.content+=\"/calefactor [on/off] --> Para activar o desactivar el controlador de temperatura automatico\\n\";\n msg.payload.content+=\"/temp [temperatura] --> Para establecer la temperatura del cuarto\\n\";\n msg.payload.content+=\"/ledPWM [intensidad] --> Establece la intensidad del led según el parametro\\n\";\n msg.payload.content+=\"/ledD [on/off] --> Para encender o apagar el led digital\\n\";\n msg.payload.content+=\"/actualiza --> Para actualizar la ESP\\n\";\n msg.payload.content+=\"/TempMax [temperatura] --> Para establecer un limite superior de temperatura\\n\"; \n msg.payload.content+=\"/TempMin [temperatura] --> Para establecer un limite inferior de temperatura\\n\"; \n return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 540,
+        "y": 140,
+        "wires": [
+            [
+                "6248ef27.2401f"
+            ]
+        ]
+    },
+    {
+        "id": "4ea3ec7a.0afb74",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "",
+        "func": "var per=global.get(\"per\");\nvar periodo=msg.payload.root.prediccion[0].dia[0].estado_cielo[per].$.periodo;\nvar estadocielo=msg.payload.root.prediccion[0].dia[0].estado_cielo[per].$.descripcion;\nvar lluvia=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[per]._;\nvar estadocielo2=msg.payload.root.prediccion[0].dia[1].estado_cielo[0].$.descripcion;\nvar lluvia2=msg.payload.root.prediccion[0].dia[1].prob_precipitacion[0]._;\nvar prediccion= msg.payload.root.elaborado[0];\n\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nmsg.payload.content=\"Segúnla AEMET la predicción para las próximas horas(\"+periodo+\") es de cielo \"+estadocielo+\" y probabilidad de lluvia de \"+lluvia+\"%. \";\nmsg.payload.content+=\"Mañana se espera \"+estadocielo2+\" y probabilidad de lluvia de \"+lluvia2+\"%. \\n\";\nmsg.payload.content+=\"Predicción elaborada: \"+prediccion;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 828.2999877929688,
+        "y": 494.99999618530273,
+        "wires": [
+            [
+                "a6e4ff01.ce5ca",
+                "54357ce3.d80314"
+            ]
+        ]
+    },
+    {
+        "id": "a6e4ff01.ce5ca",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "lo que se envia",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 992.2999877929688,
+        "y": 464.99999618530273,
+        "wires": []
+    },
+    {
+        "id": "54610b78.f87704",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "seleccion de peridos",
+        "func": "var now=new Date();\nvar hora = now.getHours();\nif(hora<6 && hora>=0)msg.payload=3;\nelse if(hora<12 && hora>=6)msg.payload=4;\nelse if(hora<18 && hora>=12)msg.payload=5;\nelse if(hora<24 && hora>=18)msg.payload=6;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 481.29998779296875,
+        "y": 339.99999618530273,
+        "wires": [
+            [
+                "6172ab28.8cd964",
+                "25a61622.45b3ba"
+            ]
+        ]
+    },
+    {
+        "id": "6172ab28.8cd964",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "periodo",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 660,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "25a61622.45b3ba",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "per",
+        "rules": [
+            {
+                "t": "set",
+                "p": "per",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 672.2999877929688,
+        "y": 354.99999618530273,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "53574e2f.b44b4",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 465.29998779296875,
+        "y": 385.99999618530273,
+        "wires": [
+            [
+                "1af2ba44.73eca6"
+            ]
+        ]
+    },
+    {
+        "id": "b6e02f80.6bb99",
+        "type": "telegram receiver",
+        "z": "693561c.6c425a",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 290,
+        "y": 140,
+        "wires": [
+            [
+                "68fda091.a9d21"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "47eb9d45.713094",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "Bot Tiempo",
+        "command": "/tiempo",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 282.29998779296875,
+        "y": 362.99999618530273,
+        "wires": [
+            [
+                "a3e095d7.cea038",
+                "54610b78.f87704",
+                "53574e2f.b44b4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6248ef27.2401f",
+        "type": "telegram sender",
+        "z": "693561c.6c425a",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 790,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "54357ce3.d80314",
+        "type": "telegram sender",
+        "z": "693561c.6c425a",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1006.2999877929688,
+        "y": 516.9999961853027,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc0c25d5.074e48",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "/ledPWM {intensidad}",
+        "command": "/ledPWM",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 320,
+        "y": 1020,
+        "wires": [
+            [
+                "6a526fc5.6c934",
+                "a6a1432c.24273"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6a526fc5.6c934",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "led",
+        "rules": [
+            {
+                "t": "set",
+                "p": "led",
+                "pt": "global",
+                "to": "payload.content",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 1020,
+        "wires": [
+            [
+                "f19ae0b8.fbb6a",
+                "e278a56a.a3e1e8"
+            ]
+        ]
+    },
+    {
+        "id": "9cfb4a55.adbb98",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "/ledD {on / off}",
+        "command": "/ledD",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 1200,
+        "wires": [
+            [
+                "c2dede35.62c92",
+                "f78b1cae.2dec8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b77ea683.f87218",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "/actualiza",
+        "command": "/actualiza",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 280,
+        "y": 1320,
+        "wires": [
+            [
+                "99f25aca.a87168",
+                "cf925bc8.f86478"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6f32c089.ff40a",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "Led Digital",
+        "rules": [
+            {
+                "t": "set",
+                "p": "LedDigital",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 650,
+        "y": 1200,
+        "wires": [
+            [
+                "4229c82.f28e838"
+            ]
+        ]
+    },
+    {
+        "id": "c2dede35.62c92",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "true/false",
+        "func": "var estado=msg.payload.content;\nvar error;\nif(estado==\" on\" || estado==\" ON\"){\n    men={payload:true};\n    \n    return [men,null];\n}\nelse if(estado==\" off\" || estado==\" OFF\"){\n    men={payload:false};\n    return [men,null];\n}\nelse{\n    error={payload:\"error\"};\n    return [null,error];\n}",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 460,
+        "y": 1200,
+        "wires": [
+            [
+                "6f32c089.ff40a",
+                "3eefafbb.a6adf"
+            ],
+            [
+                "6f32c089.ff40a"
+            ]
+        ]
+    },
+    {
+        "id": "f19ae0b8.fbb6a",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "config",
+        "func": "var led=parseInt(global.get(\"led\"));\n\nmsg.payload={\"level\":led};\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 850,
+        "y": 960,
+        "wires": [
+            [
+                "8fc371a3.132f2"
+            ]
+        ]
+    },
+    {
+        "id": "a6a1432c.24273",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 980,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e278a56a.a3e1e8",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "RespuestaPWM",
+        "func": "var led=parseInt(global.get(\"led\"));\n\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nmsg.payload.content=\"La intensidad seleccionada para el led (PWM) es de \"+led+\"%\\n\";\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1040,
+        "y": 1020,
+        "wires": [
+            [
+                "b5809d7.99ed16"
+            ]
+        ]
+    },
+    {
+        "id": "4229c82.f28e838",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "RespuestaLedDigital",
+        "func": "var led=global.get(\"LedDigital\");\nvar estado;\n\nif(led==true)estado=\"Encendiendo\";\nelse if(led==false)estado=\"Apagando\";\nelse if(led==\"error\")estado=\"Error en el comando para interactuar con\"\nmsg.payload={};\n\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nmsg.payload.content=(estado+\" el led digital\\n\");\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1040,
+        "y": 1240,
+        "wires": [
+            [
+                "b5809d7.99ed16"
+            ]
+        ]
+    },
+    {
+        "id": "b5809d7.99ed16",
+        "type": "telegram sender",
+        "z": "693561c.6c425a",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1330,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f78b1cae.2dec8",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "99f25aca.a87168",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "true",
+        "func": "msg.payload=true;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 450,
+        "y": 1320,
+        "wires": [
+            [
+                "b203efb9.43399"
+            ]
+        ]
+    },
+    {
+        "id": "b203efb9.43399",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "actualiza",
+        "rules": [
+            {
+                "t": "set",
+                "p": "actualiza",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 1320,
+        "wires": [
+            [
+                "32cc469f.88cbda",
+                "f0236482.2fa098"
+            ]
+        ]
+    },
+    {
+        "id": "cf925bc8.f86478",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 1280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "32cc469f.88cbda",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "RespuestaActualiza",
+        "func": "msg.payload={};\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nmsg.payload.content=\"Actualizando a la ultima versión\\n\";\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1060,
+        "y": 1340,
+        "wires": [
+            [
+                "b5809d7.99ed16"
+            ]
+        ]
+    },
+    {
+        "id": "6c5e6122.93a74",
+        "type": "comment",
+        "z": "693561c.6c425a",
+        "name": "Bloques de configuracion basica",
+        "info": "",
+        "x": 310,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "8fc371a3.132f2",
+        "type": "mqtt out",
+        "z": "693561c.6c425a",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/led/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "42be8612.bd3fa8",
+        "x": 1350,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "3eefafbb.a6adf",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "config",
+        "func": "var LedDigital=global.get(\"LedDigital\");\n\nmsg.payload={\"LedDigital\":LedDigital};\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 1140,
+        "wires": [
+            [
+                "897ab48f.e2b718"
+            ]
+        ]
+    },
+    {
+        "id": "f0236482.2fa098",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "config",
+        "func": "var actualiza=global.get(\"actualiza\");\n\n\nmsg.payload={\"actualiza\":actualiza};\n\nglobal.set(\"actualiza\",false);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 810,
+        "y": 1400,
+        "wires": [
+            [
+                "7c15e00b.1c033"
+            ]
+        ]
+    },
+    {
+        "id": "897ab48f.e2b718",
+        "type": "mqtt out",
+        "z": "693561c.6c425a",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/switch/cmd",
+        "qos": "",
+        "retain": "",
+        "broker": "42be8612.bd3fa8",
+        "x": 940,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "7c15e00b.1c033",
+        "type": "mqtt out",
+        "z": "693561c.6c425a",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/FOTA",
+        "qos": "",
+        "retain": "",
+        "broker": "42be8612.bd3fa8",
+        "x": 1040,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "7df88d11.b14de4",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "/TempMax",
+        "command": "/TempMax",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 340,
+        "y": 1660,
+        "wires": [
+            [
+                "bcb5ef7a.f44f2",
+                "635ad608.d27ec8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "bcb5ef7a.f44f2",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "idtempMax",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 1600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dbf5e635.95d3b8",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "TempMax",
+        "func": "var tempMax=parseFloat(global.get(\"tempMax\"));\nvar MqttTemp=msg.payload;\n\nmsg.payload={};\n\nmsg.payload.chatId=global.get(\"idtempMax\");\nmsg.payload.type=\"message\";\n\nif(MqttTemp>=tempMax){\n    \nmsg.payload.content=\"Se ha superado el limite de temperatura previsto de: \"+tempMax+\"ºC, la temperatura actual es de: \"+MqttTemp+\" ºC\";\n\nreturn msg;    \n    \n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 820,
+        "y": 1680,
+        "wires": [
+            [
+                "a686a23c.ad15f",
+                "fbfff4f9.f443d8"
+            ]
+        ]
+    },
+    {
+        "id": "635ad608.d27ec8",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "TempMax",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tempMax",
+                "pt": "global",
+                "to": "payload.content",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 1680,
+        "wires": [
+            [
+                "dbf5e635.95d3b8",
+                "3336d6f5.9acdfa",
+                "5b1c198b.4796c8"
+            ]
+        ]
+    },
+    {
+        "id": "a686a23c.ad15f",
+        "type": "telegram sender",
+        "z": "693561c.6c425a",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1150,
+        "y": 1800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a9dcdcd8.57b77",
+        "type": "telegram command",
+        "z": "693561c.6c425a",
+        "name": "/TempMin",
+        "command": "/TempMin",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 340,
+        "y": 1920,
+        "wires": [
+            [
+                "22ba7e5c.9d53f2",
+                "7453e85c.d44d98"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "22ba7e5c.9d53f2",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "idtempMin",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 1860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "78cdebe7.dd4bc4",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "TempMin",
+        "func": "var tempMin=parseFloat(global.get(\"tempMin\"));\nvar MqttTemp=msg.payload;\n\nmsg.payload={};\n\nmsg.payload.chatId=global.get(\"idtempMin\");\nmsg.payload.type=\"message\";\n\nif(MqttTemp<=tempMin){\n    \nmsg.payload.content=\"La temperatura es menor al limite inferior establecido de: \"+tempMin+\"ºC, la temperatura actual es de: \"+MqttTemp+\" ºC\";\n\nreturn msg;    \n    \n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 820,
+        "y": 1940,
+        "wires": [
+            [
+                "a686a23c.ad15f",
+                "66ef1e91.94745"
+            ]
+        ]
+    },
+    {
+        "id": "7453e85c.d44d98",
+        "type": "change",
+        "z": "693561c.6c425a",
+        "name": "TempMin",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tempMin",
+                "pt": "global",
+                "to": "payload.content",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 1940,
+        "wires": [
+            [
+                "78cdebe7.dd4bc4",
+                "8108dfe9.6835c",
+                "2520b3f7.b8d4ec"
+            ]
+        ]
+    },
+    {
+        "id": "51f59ebb.8541",
+        "type": "mqtt in",
+        "z": "693561c.6c425a",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "42be8612.bd3fa8",
+        "x": 318.8888854980469,
+        "y": 1798.8888521194458,
+        "wires": [
+            [
+                "9bec8d0f.fedea"
+            ]
+        ]
+    },
+    {
+        "id": "2f885415.2cd80c",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "datos",
+        "func": "var temp = msg.payload.DHT11.Temperatura;\n\nmsg.payload=temp;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 690,
+        "y": 1800,
+        "wires": [
+            [
+                "dbf5e635.95d3b8",
+                "78cdebe7.dd4bc4",
+                "33a9b29c.74e44e"
+            ]
+        ]
+    },
+    {
+        "id": "33a9b29c.74e44e",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "9bec8d0f.fedea",
+        "type": "json",
+        "z": "693561c.6c425a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 570,
+        "y": 1800,
+        "wires": [
+            [
+                "2f885415.2cd80c",
+                "15fcc9d0.960df6"
+            ]
+        ]
+    },
+    {
+        "id": "f132fcb2.fdfb4",
+        "type": "comment",
+        "z": "693561c.6c425a",
+        "name": "Alarma para seleccionar limites de temperatura",
+        "info": "",
+        "x": 380,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "70cd1f16.1870c",
+        "type": "ui_slider",
+        "z": "693561c.6c425a",
+        "name": "",
+        "label": "Temperatura máxima",
+        "tooltip": "",
+        "group": "23c494fb.a0407c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "",
+        "min": 0,
+        "max": "50",
+        "step": "0.5",
+        "x": 180,
+        "y": 1720,
+        "wires": [
+            [
+                "ea022ce6.8d01f"
+            ]
+        ]
+    },
+    {
+        "id": "ea022ce6.8d01f",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "",
+        "func": "var content=msg.payload;\n\nmsg.payload={};\nmsg.payload.type=\"message\";\nmsg.payload.content=content;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 378.75000381469727,
+        "y": 1726.2500267028809,
+        "wires": [
+            [
+                "635ad608.d27ec8"
+            ]
+        ]
+    },
+    {
+        "id": "3336d6f5.9acdfa",
+        "type": "ui_text",
+        "z": "693561c.6c425a",
+        "group": "23c494fb.a0407c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperatura máxima seleccionada",
+        "format": "{{msg.payload.content}}",
+        "layout": "row-spread",
+        "x": 820,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "301de034.53067",
+        "type": "ui_slider",
+        "z": "693561c.6c425a",
+        "name": "",
+        "label": "Temperatura mínima",
+        "tooltip": "",
+        "group": "23c494fb.a0407c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "",
+        "min": 0,
+        "max": "50",
+        "step": "0.5",
+        "x": 200,
+        "y": 2040,
+        "wires": [
+            [
+                "e4383cae.e1d8"
+            ]
+        ]
+    },
+    {
+        "id": "e4383cae.e1d8",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "",
+        "func": "var content=msg.payload;\n\nmsg.payload={};\nmsg.payload.type=\"message\";\nmsg.payload.content=content;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 380,
+        "y": 2040,
+        "wires": [
+            [
+                "7453e85c.d44d98"
+            ]
+        ]
+    },
+    {
+        "id": "8108dfe9.6835c",
+        "type": "ui_text",
+        "z": "693561c.6c425a",
+        "group": "23c494fb.a0407c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperatura mínima seleccionada",
+        "format": "{{msg.payload.content}}",
+        "layout": "row-spread",
+        "x": 700,
+        "y": 2040,
+        "wires": []
+    },
+    {
+        "id": "3cf6d9cc.b8ac86",
+        "type": "ui_toast",
+        "z": "693561c.6c425a",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "topic": "",
+        "name": "",
+        "x": 1370,
+        "y": 1800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fbfff4f9.f443d8",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "TempMax",
+        "func": "var tempMax=parseFloat(global.get(\"tempMax\"));\n\nmsg.topic=\"Se ha superado el limite de temperatura previsto de: \"+tempMax;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1140,
+        "y": 1680,
+        "wires": [
+            [
+                "3cf6d9cc.b8ac86"
+            ]
+        ]
+    },
+    {
+        "id": "66ef1e91.94745",
+        "type": "function",
+        "z": "693561c.6c425a",
+        "name": "TempMin",
+        "func": "var tempMin=parseFloat(global.get(\"tempMin\"));\n\nmsg.topic=\"Se ha bajado del limite inferior de temperatura previsto de: \"+tempMin;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1140,
+        "y": 1940,
+        "wires": [
+            [
+                "3cf6d9cc.b8ac86"
+            ]
+        ]
+    },
+    {
+        "id": "15fcc9d0.960df6",
+        "type": "debug",
+        "z": "693561c.6c425a",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "5b1c198b.4796c8",
+        "type": "ui_text",
+        "z": "693561c.6c425a",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperatura máxima seleccionada",
+        "format": "{{msg.payload.content}}",
+        "layout": "row-spread",
+        "x": 820,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "2520b3f7.b8d4ec",
+        "type": "ui_text",
+        "z": "693561c.6c425a",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperatura mínima seleccionada",
+        "format": "{{msg.payload.content}}",
+        "layout": "row-spread",
+        "x": 700,
+        "y": 2080,
+        "wires": []
+    },
+    {
+        "id": "4bbb932d.fc0fcc",
+        "type": "telegram bot",
+        "botname": "ElWeather_Bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "42be8612.bd3fa8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "23c494fb.a0407c",
+        "type": "ui_group",
+        "name": "Selector",
+        "tab": "bd6af99b.2308e8",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "a5f7fe0c.0b8ec",
+        "type": "ui_group",
+        "name": "Actuadores",
+        "tab": "d5b21230.e4058",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "bd6af99b.2308e8",
+        "type": "ui_tab",
+        "name": "Configuración y acciones",
+        "icon": "dashboard",
+        "order": 11,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "d5b21230.e4058",
+        "type": "ui_tab",
+        "name": "Datos actuales",
+        "icon": "dashboard",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    }
+]

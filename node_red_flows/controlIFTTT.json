@@ -1,0 +1,471 @@
+[
+    {
+        "id": "2ec31e64.794cb2",
+        "type": "tab",
+        "label": "Control IFTTT",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "40e58de7.be4024",
+        "type": "debug",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 970,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c6380d94.8ffab",
+        "type": "function",
+        "z": "2ec31e64.794cb2",
+        "name": "CONTROL TEMP",
+        "func": "var temp=global.get(\"temp\");\nvar tempDHT=global.get(\"tempDHT\");\nvar on=global.get(\"on\");\nvar enciende;\nvar apaga;\nif (temp<=tempDHT || !on){\n    apaga={payload: \"apagando\"};\n    \n    \n    return [null,apaga];   \n} \nelse if(temp>tempDHT && on){ \n    enciende={payload: \"enciende\"};\n    \n    return [enciende,null];\n    \n}",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 710,
+        "y": 200,
+        "wires": [
+            [
+                "529c6678.0a9d98"
+            ],
+            [
+                "b84890a9.bb9f8"
+            ]
+        ]
+    },
+    {
+        "id": "af0ac253.fef83",
+        "type": "telegram command",
+        "z": "2ec31e64.794cb2",
+        "name": "/temp",
+        "command": "/temp",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "23e0617d.c6845e",
+                "74872bfe.0a9754",
+                "76263b65.5ea6f4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "529c6678.0a9d98",
+        "type": "http request",
+        "z": "2ec31e64.794cb2",
+        "name": "ENCENDER CALEFACTOR",
+        "method": "GET",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/calefactorenciende/with/key/dNqiY7rr_U5PWsteYQjo8k2ZtllItRQjl5KL9jsHodV",
+        "tls": "",
+        "x": 1020,
+        "y": 180,
+        "wires": [
+            [
+                "40e58de7.be4024"
+            ]
+        ]
+    },
+    {
+        "id": "be6d7488.38ef78",
+        "type": "debug",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 970,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "b84890a9.bb9f8",
+        "type": "http request",
+        "z": "2ec31e64.794cb2",
+        "name": "APAGAR CALEFACTOR",
+        "method": "GET",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/calefactorapaga/with/key/dNqiY7rr_U5PWsteYQjo8k2ZtllItRQjl5KL9jsHodV",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 1009,
+        "y": 300,
+        "wires": [
+            [
+                "be6d7488.38ef78"
+            ]
+        ]
+    },
+    {
+        "id": "4ef876da.032808",
+        "type": "json",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 490,
+        "y": 300,
+        "wires": [
+            [
+                "bfcb6838.638a88"
+            ]
+        ]
+    },
+    {
+        "id": "bfcb6838.638a88",
+        "type": "change",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tempDHT",
+                "pt": "global",
+                "to": "payload.DHT11.Temperatura",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 300,
+        "wires": [
+            [
+                "c6380d94.8ffab"
+            ]
+        ]
+    },
+    {
+        "id": "23e0617d.c6845e",
+        "type": "change",
+        "z": "2ec31e64.794cb2",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 290,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "74872bfe.0a9754",
+        "type": "function",
+        "z": "2ec31e64.794cb2",
+        "name": "RespuestaTemp",
+        "func": "var tempDHT=global.get(\"tempDHT\");\nvar temp =msg.payload.content;\nvar on = global.get(\"on\");\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nif(on) msg.payload.content=\"La temperatura del cuarto es de \"+tempDHT+\"ºC y la que se quiere es de\" +temp+\"ºC, me pongo con ello.\";\nelse if(!on) msg.payload.content=\"La temperatura del cuarto es de \"+tempDHT+\"ºC, pero el controlador esta desactivado, activalo usando /calefactor on\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 500,
+        "y": 80,
+        "wires": [
+            [
+                "e1289dfe.538b8"
+            ]
+        ]
+    },
+    {
+        "id": "e1289dfe.538b8",
+        "type": "telegram sender",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 730,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "76263b65.5ea6f4",
+        "type": "change",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp",
+                "pt": "global",
+                "to": "payload.content",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 200,
+        "wires": [
+            [
+                "c6380d94.8ffab",
+                "18a607a4.b22b88"
+            ]
+        ]
+    },
+    {
+        "id": "18a607a4.b22b88",
+        "type": "ui_text",
+        "z": "2ec31e64.794cb2",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperatura del cuarto seleccionada ",
+        "format": "{{msg.payload.content}}",
+        "layout": "row-spread",
+        "x": 750,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "69581763.d67f78",
+        "type": "telegram command",
+        "z": "2ec31e64.794cb2",
+        "name": "/calefactor {on/off}",
+        "command": "/calefactor",
+        "bot": "4bbb932d.fc0fcc",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 230,
+        "y": 400,
+        "wires": [
+            [
+                "22794506.e82dda",
+                "36b49095.022a4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "97c8d6b5.24cb68",
+        "type": "change",
+        "z": "2ec31e64.794cb2",
+        "name": "Control Calefactor",
+        "rules": [
+            {
+                "t": "set",
+                "p": "on",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 420,
+        "wires": [
+            [
+                "ae2db0ba.a2c22"
+            ]
+        ]
+    },
+    {
+        "id": "36b49095.022a4",
+        "type": "function",
+        "z": "2ec31e64.794cb2",
+        "name": "true/false",
+        "func": "var estado=msg.payload.content;\nvar men;\nvar error;\nif(estado==\" on\" || estado==\" ON\"){\n    men={payload:true};\n    return [men,null];\n    \n}\nelse if(estado==\" off\" || estado==\" OFF\"){\n    men={payload:false}; \n    return [men,null];\n}\nelse{\n    error={payload:\"error\"};\n    return [null,error];  \n} ",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 460,
+        "y": 420,
+        "wires": [
+            [
+                "97c8d6b5.24cb68",
+                "c6380d94.8ffab"
+            ],
+            [
+                "97c8d6b5.24cb68"
+            ]
+        ]
+    },
+    {
+        "id": "22794506.e82dda",
+        "type": "change",
+        "z": "2ec31e64.794cb2",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "id",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ae2db0ba.a2c22",
+        "type": "function",
+        "z": "2ec31e64.794cb2",
+        "name": "RespuestaCalefactor",
+        "func": "msg.payload={};\nvar on=global.get(\"on\");\nvar estado;\n\nif(on==true)estado=\"Activando el flujo del calefactor\";\nelse if(on==false)estado=\"Desactivando el flujo de control del calefactor\";\nelse if(on==\"error\")estado=\"Error al interpretar el comando\"\nmsg.payload={};\n\nmsg.payload.chatId=global.get(\"id\");\nmsg.payload.type=\"message\";\n\nmsg.payload.content=estado+\"\\n\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 920,
+        "y": 420,
+        "wires": [
+            [
+                "b15154d5.a006a8"
+            ]
+        ]
+    },
+    {
+        "id": "b15154d5.a006a8",
+        "type": "telegram sender",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "bot": "4bbb932d.fc0fcc",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1150,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "63e9f1d4.2adc8",
+        "type": "mqtt in",
+        "z": "2ec31e64.794cb2",
+        "name": "",
+        "topic": "infind/GRUPO8/ESP1126067/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "aa38ea6d.8831b8",
+        "x": 260,
+        "y": 300,
+        "wires": [
+            [
+                "4ef876da.032808"
+            ]
+        ]
+    },
+    {
+        "id": "4bbb932d.fc0fcc",
+        "type": "telegram bot",
+        "botname": "ElWeather_Bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "a5f7fe0c.0b8ec",
+        "type": "ui_group",
+        "name": "Actuadores",
+        "tab": "d5b21230.e4058",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "aa38ea6d.8831b8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "d5b21230.e4058",
+        "type": "ui_tab",
+        "name": "Datos actuales",
+        "icon": "dashboard",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    }
+]

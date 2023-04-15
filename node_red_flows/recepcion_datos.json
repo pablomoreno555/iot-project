@@ -1,0 +1,1063 @@
+[
+    {
+        "id": "e263b37d.660e1",
+        "type": "tab",
+        "label": "Recepción de datos",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "183e6a10.67e7d6",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Paco_Conexion",
+        "topic": "infind/GRUPO8/ESP1126067/conexion",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "f5e9494d.283648",
+        "x": 94.42863464355469,
+        "y": 57.5714111328125,
+        "wires": [
+            [
+                "8988214b.59fbb"
+            ]
+        ]
+    },
+    {
+        "id": "8246a4a0.132e18",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Paco_LedStatus",
+        "topic": "infind/GRUPO8/ESP1126067/led/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 92.1429443359375,
+        "y": 246.28573608398438,
+        "wires": [
+            [
+                "ba5dea8e.29b528"
+            ]
+        ]
+    },
+    {
+        "id": "2fbf1d6c.5f7ea2",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Paco_Datos",
+        "topic": "infind/GRUPO8/ESP1126067/datos",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 99.99999618530273,
+        "y": 758.4284534454346,
+        "wires": [
+            [
+                "c02314ea.7ae068"
+            ]
+        ]
+    },
+    {
+        "id": "d972e8e9.3c9ce8",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "conexion",
+        "func": "var chipid = msg.payload.CHIPID;\nvar selector = global.get(\"selectorID\");\n\n// Obtengo la fecha y hora actual con Date()\nvar ahora = new Date();\n// hora local\nvar hora=ahora.toLocaleTimeString('es-ES', {timeZone: 'Europe/Madrid', hour12: false});\n// fecha local\nvar fecha=ahora.toLocaleDateString('es-ES', {timeZone: 'Europe/Madrid'});\n\nmsg01={\"payload\":fecha}\nmsg02={\"payload\":hora}\n\nif (chipid==\"ESP1126067\") // PACO\n{\n    var conexion1 = msg.payload.online;\n    msg1={\"payload\":conexion1};\n}\nelse if (chipid==\"ESP833295\") // PABLO\n{\n    var conexion2 = msg.payload.online;\n    msg2={\"payload\":conexion2};\n}\nelse if (chipid==\"ESP5821794\") // SERGIO\n{\n    var conexion3 = msg.payload.online;\n    msg3={\"payload\":conexion3};\n}\nelse if (chipid==\"ESP1089673\") // ADRI\n{\n    var conexion4 = msg.payload.online;\n    msg4={\"payload\":conexion4};\n}\n\nif (selector==\"ESP1126067\")\n{\n    return [msg1,msg01,msg02];\n}\nelse if (selector==\"ESP833295\")\n{\n    return [msg2,msg01,msg02];\n}\nelse if (selector==\"ESP5821794\")\n{\n    return [msg3,msg01,msg02];\n}\nelse if (selector==\"ESP1089673\")\n{\n    return [msg4,msg01,msg02];\n}",
+        "outputs": 3,
+        "noerr": 0,
+        "x": 439.42863273620605,
+        "y": 105.5714340209961,
+        "wires": [
+            [
+                "e1f3dda4.6a2b7"
+            ],
+            [
+                "6d378c51.3e8464"
+            ],
+            [
+                "5be2c82a.d4cc08"
+            ]
+        ]
+    },
+    {
+        "id": "d7aebe42.eeb26",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "datos",
+        "func": "var chipid = msg.payload.CHIPID;\nvar selector = global.get(\"selectorID\");\n\n// Obtengo la fecha y hora actual con Date()\nvar ahora = new Date();\n// hora local\nvar hora=ahora.toLocaleTimeString('es-ES', {timeZone: 'Europe/Madrid', hour12: false});\n// fecha local\nvar fecha=ahora.toLocaleDateString('es-ES', {timeZone: 'Europe/Madrid'});\n\nmsg01={\"payload\":fecha}\nmsg02={\"payload\":hora}\n\nif (chipid==\"ESP1126067\") // PACO\n{\n    var hum1 = msg.payload.DHT11.Humedad;\n    var temp1 = msg.payload.DHT11.Temperatura;\n    var led1 = msg.payload.LED;\n    var uptime1 = msg.payload.Uptime;\n    var ssid1 = msg.payload.WiFi.SSId;\n    var ip1 = msg.payload.WiFi.IP;\n    var rssi1 = msg.payload.WiFi.RSSI;\n    var nivel_agua1 = msg.payload.NivelAgua;\n    \n    msg11={\"payload\":hum1};\n    msg21={\"payload\":temp1};\n    msg31={\"payload\":led1};\n    msg41={\"payload\":uptime1};\n    msg51={\"payload\":ssid1};\n    msg61={\"payload\":ip1};\n    msg71={\"payload\":rssi1};\n    msg81={\"payload\":nivel_agua1};\n    \n}\nelse if (chipid==\"ESP833295\") // PABLO\n{\n    var hum2 = msg.payload.DHT11.Humedad;\n    var temp2 = msg.payload.DHT11.Temperatura;\n    var led2 = msg.payload.LED;\n    var uptime2 = msg.payload.Uptime;\n    var ssid2 = msg.payload.WiFi.SSId;\n    var ip2 = msg.payload.WiFi.IP;\n    var rssi2 = msg.payload.WiFi.RSSI;\n    var nivel_agua2 = msg.payload.NivelAgua;\n    \n    msg12={\"payload\":hum2};\n    msg22={\"payload\":temp2};\n    msg32={\"payload\":led2};\n    msg42={\"payload\":uptime2};\n    msg52={\"payload\":ssid2};\n    msg62={\"payload\":ip2};\n    msg72={\"payload\":rssi2};\n    msg82={\"payload\":nivel_agua2};\n}\n\nelse if (chipid==\"ESP5821794\") // SERGIO\n{\n    var hum3 = msg.payload.DHT11.Humedad;\n    var temp3 = msg.payload.DHT11.Temperatura;\n    var led3 = msg.payload.LED;\n    var uptime3 = msg.payload.Uptime;\n    var ssid3 = msg.payload.WiFi.SSId;\n    var ip3 = msg.payload.WiFi.IP;\n    var rssi3 = msg.payload.WiFi.RSSI;\n    var nivel_agua3 = msg.payload.NivelAgua;\n    \n    msg13={\"payload\":hum3};\n    msg23={\"payload\":temp3};\n    msg33={\"payload\":led3};\n    msg43={\"payload\":uptime3};\n    msg53={\"payload\":ssid3};\n    msg63={\"payload\":ip3};\n    msg73={\"payload\":rssi3};\n    msg83={\"payload\":nivel_agua3};\n}\n\nelse if (chipid==\"ESP1089673\") // ADRI\n{\n    var hum4 = msg.payload.DHT11.Humedad;\n    var temp4 = msg.payload.DHT11.Temperatura;\n    var led4 = msg.payload.LED;\n    var uptime4 = msg.payload.Uptime;\n    var ssid4 = msg.payload.WiFi.SSId;\n    var ip4 = msg.payload.WiFi.IP;\n    var rssi4 = msg.payload.WiFi.RSSI;\n    var nivel_agua4 = msg.payload.NivelAgua;\n    \n    msg14={\"payload\":hum4};\n    msg24={\"payload\":temp4};\n    msg34={\"payload\":led4};\n    msg44={\"payload\":uptime4};\n    msg54={\"payload\":ssid4};\n    msg64={\"payload\":ip4};\n    msg74={\"payload\":rssi4};\n    msg84={\"payload\":nivel_agua4};\n}\n\nif (selector==\"ESP1126067\")\n{\n    return [msg01,msg02,msg11,msg21,msg31,msg41,msg51,msg61,msg71,msg81];\n}\nelse if (selector==\"ESP833295\")\n{\n    return [msg01,msg02,msg12,msg22,msg32,msg42,msg52,msg62,msg72,msg82];\n}\nelse if (selector==\"ESP5821794\")\n{\n    return [msg01,msg02,msg13,msg23,msg33,msg43,msg53,msg63,msg73,msg83];\n}\nelse if (selector==\"ESP1089673\")\n{\n    return [msg01,msg02,msg14,msg24,msg34,msg44,msg54,msg64,msg74,msg84];\n}\n\n",
+        "outputs": 10,
+        "noerr": 0,
+        "x": 630.4284477233887,
+        "y": 751.4284973144531,
+        "wires": [
+            [
+                "6d378c51.3e8464"
+            ],
+            [
+                "5be2c82a.d4cc08"
+            ],
+            [
+                "9aa5bb2c.1343f8"
+            ],
+            [
+                "2f9b7491.6e055c"
+            ],
+            [],
+            [
+                "2f25cd6.3fcb832"
+            ],
+            [
+                "fd702c1b.05699"
+            ],
+            [
+                "f203646a.b73d68"
+            ],
+            [
+                "c5a5fb80.35c4f8"
+            ],
+            [
+                "ab2367d2.898978"
+            ]
+        ]
+    },
+    {
+        "id": "adf6cd46.a7429",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "led status",
+        "func": "var chipid = msg.payload.CHIPID;\nvar selector = global.get(\"selectorID\");\n\n// Obtengo la fecha y hora actual con Date()\nvar ahora = new Date();\n// hora local\nvar hora=ahora.toLocaleTimeString('es-ES', {timeZone: 'Europe/Madrid', hour12: false});\n// fecha local\nvar fecha=ahora.toLocaleDateString('es-ES', {timeZone: 'Europe/Madrid'});\n\nmsg01={\"payload\":fecha}\nmsg02={\"payload\":hora}\n\nif (chipid==\"ESP1126067\") // PACO\n{\n    var status1 = msg.payload.led;\n    var origen1 = msg.payload.origen;\n    msg11={\"payload\": origen1};\n    msg1={\"payload\":status1};\n}\nelse if (chipid==\"ESP833295\") // PABLO\n{\n    var status2 = msg.payload.led;\n    var origen2 = msg.payload.origen;\n    msg12={\"payload\": origen2};\n    msg2={\"payload\":status2}; \n}\nelse if (chipid==\"ESP5821794\") // SERGIO\n{\n    var status3 = msg.payload.led;\n    var origen3 = msg.payload.origen;\n    msg13={\"payload\": origen3};\n    msg3={\"payload\":status3};\n}\nelse if (chipid==\"ESP1089673\") // ADRI\n{\n    var status4 = msg.payload.Switch;\n    var origen4 = msg.payload.origen;\n    msg14={\"payload\": origen4};\n    msg3={\"payload\":status4};\n}\n\nif (selector==\"ESP1126067\")\n{\n    return [msg11,msg1,msg01,msg02];\n}\nelse if (selector==\"ESP833295\")\n{\n    return [msg12,msg2,msg01,msg02];\n}\nelse if (selector==\"ESP5821794\")\n{\n    return [msg13,msg3,msg01,msg02];\n}\nelse if (selector==\"ESP1089673\")\n{\n    return [msg14,msg4,msg01,msg02];\n}",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 497.53568267822266,
+        "y": 255.7143440246582,
+        "wires": [
+            [
+                "56113d3a.de8954"
+            ],
+            [
+                "6a0b810b.fd21b"
+            ],
+            [
+                "6d378c51.3e8464"
+            ],
+            [
+                "5be2c82a.d4cc08"
+            ]
+        ]
+    },
+    {
+        "id": "c5a5fb80.35c4f8",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "55c62422.ff605c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 926.4602661132812,
+        "y": 818.74609375,
+        "wires": []
+    },
+    {
+        "id": "2f25cd6.3fcb832",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "7a2cbf0.1f3114",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 936.6031494140625,
+        "y": 714.888916015625,
+        "wires": []
+    },
+    {
+        "id": "f203646a.b73d68",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "55c62422.ff605c",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Dirección IP",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 946.3174438476562,
+        "y": 784.888916015625,
+        "wires": []
+    },
+    {
+        "id": "fd702c1b.05699",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "55c62422.ff605c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSId",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 926.3174438476562,
+        "y": 748.8889770507812,
+        "wires": []
+    },
+    {
+        "id": "9aa5bb2c.1343f8",
+        "type": "ui_gauge",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "group": "14055e45.e5bb12",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 938.4126586914062,
+        "y": 645.888916015625,
+        "wires": []
+    },
+    {
+        "id": "2f9b7491.6e055c",
+        "type": "ui_gauge",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "group": "14055e45.e5bb12",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-5",
+        "max": "40",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 947.269775390625,
+        "y": 681.0317993164062,
+        "wires": []
+    },
+    {
+        "id": "c02314ea.7ae068",
+        "type": "json",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 309.2856750488281,
+        "y": 824.8571166992188,
+        "wires": [
+            [
+                "d7aebe42.eeb26",
+                "6aae0b2c.05e254",
+                "c88415c1.275138"
+            ]
+        ]
+    },
+    {
+        "id": "6a0b810b.fd21b",
+        "type": "ui_gauge",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "LED",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#5cd0ff",
+            "#2376df",
+            "#081b90"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 730.571460723877,
+        "y": 244.00004768371582,
+        "wires": []
+    },
+    {
+        "id": "ba5dea8e.29b528",
+        "type": "json",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 299.2857780456543,
+        "y": 297.4285879135132,
+        "wires": [
+            [
+                "adf6cd46.a7429",
+                "8b9c539a.bdf36"
+            ]
+        ]
+    },
+    {
+        "id": "8988214b.59fbb",
+        "type": "json",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 257.0000343322754,
+        "y": 110.14284992218018,
+        "wires": [
+            [
+                "d972e8e9.3c9ce8",
+                "8e1a57b4.7fd6f8"
+            ]
+        ]
+    },
+    {
+        "id": "5d262ce.6e3fed4",
+        "type": "mongodb out",
+        "z": "e263b37d.660e1",
+        "mongodb": "ca4c64d0.67b3c8",
+        "name": "",
+        "collection": "datos",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 990.571533203125,
+        "y": 923.7142333984375,
+        "wires": []
+    },
+    {
+        "id": "82c86a4.9569e98",
+        "type": "mongodb out",
+        "z": "e263b37d.660e1",
+        "mongodb": "ca4c64d0.67b3c8",
+        "name": "",
+        "collection": "conexion",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 841.6666946411133,
+        "y": 53.66667366027832,
+        "wires": []
+    },
+    {
+        "id": "8e1a57b4.7fd6f8",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "+ fecha",
+        "func": "msg.payload.date = new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 442.85717582702637,
+        "y": 56.28571319580078,
+        "wires": [
+            [
+                "82c86a4.9569e98"
+            ]
+        ]
+    },
+    {
+        "id": "c8a2e09d.60428",
+        "type": "mongodb out",
+        "z": "e263b37d.660e1",
+        "mongodb": "ca4c64d0.67b3c8",
+        "name": "",
+        "collection": "led",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 771.6191673278809,
+        "y": 326.47629165649414,
+        "wires": []
+    },
+    {
+        "id": "8b9c539a.bdf36",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "+ fecha",
+        "func": "msg.payload.date = new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 513.571662902832,
+        "y": 308.0000419616699,
+        "wires": [
+            [
+                "c8a2e09d.60428"
+            ]
+        ]
+    },
+    {
+        "id": "ab2367d2.898978",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "14055e45.e5bb12",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Nivel Agua",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 944.6032104492188,
+        "y": 853.603271484375,
+        "wires": []
+    },
+    {
+        "id": "fec41538.853d08",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Paco_SwitchStatus",
+        "topic": "infind/GRUPO8/ESP1126067/switch/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 108.00006103515625,
+        "y": 430.0001220703125,
+        "wires": [
+            [
+                "5e94ce7d.6a6cb"
+            ]
+        ]
+    },
+    {
+        "id": "b27185cf.7b4a48",
+        "type": "ui_led",
+        "z": "e263b37d.660e1",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": "4",
+        "height": "1",
+        "label": "Switch",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "gray",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "green",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "name": "Switch",
+        "x": 743.0357151031494,
+        "y": 439.3056402206421,
+        "wires": []
+    },
+    {
+        "id": "d281fb3c.961978",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "switch status",
+        "func": "var chipid = msg.payload.CHIPID;\nvar selector = global.get(\"selectorID\");\n\n// Obtengo la fecha y hora actual con Date()\nvar ahora = new Date();\n// hora local\nvar hora=ahora.toLocaleTimeString('es-ES', {timeZone: 'Europe/Madrid', hour12: false});\n// fecha local\nvar fecha=ahora.toLocaleDateString('es-ES', {timeZone: 'Europe/Madrid'});\n\nmsg01={\"payload\":fecha}\nmsg02={\"payload\":hora}\n\nif (chipid==\"ESP1126067\") // PACO\n{\n    var LedDigital1 = msg.payload.Switch;\n    var origen1 = msg.payload.origen;\n    msg11={\"payload\": origen1};\n    msg1={\"payload\":LedDigital1};\n}\nelse if (chipid==\"ESP833295\") // PABLO\n{\n    var LedDigital2 = msg.payload.Switch;\n    var origen2 = msg.payload.origen;\n    msg12={\"payload\": origen2};\n    msg2={\"payload\":LedDigital2};\n}\nelse if (chipid==\"ESP5821794\") // SERGIO\n{\n    var LedDigital3 = msg.payload.Switch;\n    var origen3 = msg.payload.origen;\n    msg13={\"payload\": origen3};\n    msg3={\"payload\":LedDigital3};\n}\nelse if (chipid==\"ESP1089673\") // ADRI\n{\n    var LedDigital4 = msg.payload.Switch;\n    var origen4 = msg.payload.origen;\n    msg14={\"payload\": origen4};\n    msg4={\"payload\":LedDigital4};\n}\n\nif (selector==\"ESP1126067\")\n{\n    return [msg1,msg01,msg02,msg11];\n}\nelse if (selector==\"ESP833295\")\n{\n    return [msg2,msg01,msg02,msg12];\n}\nelse if (selector==\"ESP5821794\")\n{\n    return [msg3,msg01,msg02,msg13];\n}\nelse if (selector==\"ESP1089673\")\n{\n    return [msg4,msg01,msg02,msg14];\n}",
+        "outputs": 4,
+        "noerr": 0,
+        "x": 570,
+        "y": 480,
+        "wires": [
+            [
+                "b27185cf.7b4a48"
+            ],
+            [
+                "6d378c51.3e8464"
+            ],
+            [
+                "5be2c82a.d4cc08"
+            ],
+            [
+                "789f025.2346bfc"
+            ]
+        ]
+    },
+    {
+        "id": "5e94ce7d.6a6cb",
+        "type": "json",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 326.7143669128418,
+        "y": 484.42863273620605,
+        "wires": [
+            [
+                "d281fb3c.961978",
+                "d9ea04d5.e65a18"
+            ]
+        ]
+    },
+    {
+        "id": "7eeb4fdb.bf06",
+        "type": "mongodb out",
+        "z": "e263b37d.660e1",
+        "mongodb": "ca4c64d0.67b3c8",
+        "name": "",
+        "collection": "switch",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 779.0228958129883,
+        "y": 372.55556869506836,
+        "wires": []
+    },
+    {
+        "id": "d9ea04d5.e65a18",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "+ fecha",
+        "func": "msg.payload.date = new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 552.0228958129883,
+        "y": 409.888952255249,
+        "wires": [
+            [
+                "7eeb4fdb.bf06"
+            ]
+        ]
+    },
+    {
+        "id": "6a74c4b3.eb758c",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "error?",
+        "func": "var errorTemp = false;\nvar errorHum = false;\nvar errorNivAgua = false;\nvar datos = msg;\nvar error;\n\nif(msg.payload.DHT11.Temperatura === null || msg.payload.DHT11.Humedad === null || msg.payload.NivelAgua === 0)\n{\n    if(msg.payload.DHT11.Temperatura === null )\n        errorTemp = true;\n        \n    if(msg.payload.DHT11.Humedad === null )\n        errorHum = true;\n        \n    if(msg.payload.NivelAgua === 0)\n        errorNivAgua = true;\n        \n    error ={payload: {\"errorTemp\": errorTemp, \"errorHum\": errorHum, \"errorNivelAgua\": errorNivAgua,\"CHIPID\":datos.payload.CHIPID}};\n    error.payload.date = new Date();\n    return[datos,error];\n}\nelse\n{\n    return [datos,null];\n}",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 682.3821105957031,
+        "y": 929.1036758422852,
+        "wires": [
+            [
+                "5d262ce.6e3fed4"
+            ],
+            [
+                "7087125e.3259cc"
+            ]
+        ]
+    },
+    {
+        "id": "7087125e.3259cc",
+        "type": "mongodb out",
+        "z": "e263b37d.660e1",
+        "mongodb": "ca4c64d0.67b3c8",
+        "name": "",
+        "collection": "errores",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 976.610107421875,
+        "y": 994.301513671875,
+        "wires": []
+    },
+    {
+        "id": "b561c0ea.507da",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Pablo_Datos",
+        "topic": "infind/GRUPO8/ESP833295/datos",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 103.42856979370117,
+        "y": 801.2857437133789,
+        "wires": [
+            [
+                "c02314ea.7ae068"
+            ]
+        ]
+    },
+    {
+        "id": "5ab3c6a0.f8d0c8",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Sergio_Datos",
+        "topic": "infind/GRUPO8/ESP5821794/datos",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 105.28571510314941,
+        "y": 846.9999885559082,
+        "wires": [
+            [
+                "c02314ea.7ae068"
+            ]
+        ]
+    },
+    {
+        "id": "d3df0dd5.127da",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Adri_Datos",
+        "topic": "infind/GRUPO8/ESP1089673/datos",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 97.14285278320312,
+        "y": 892.1428508758545,
+        "wires": [
+            [
+                "c02314ea.7ae068"
+            ]
+        ]
+    },
+    {
+        "id": "351b687f.f3a768",
+        "type": "ui_dropdown",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "label": "Selector de usuario",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "454c74fd.3fcbac",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "Paco",
+                "value": "ESP1126067",
+                "type": "str"
+            },
+            {
+                "label": "Pablo",
+                "value": "ESP833295",
+                "type": "str"
+            },
+            {
+                "label": "Sergio",
+                "value": "ESP5821794",
+                "type": "str"
+            },
+            {
+                "label": "Adri",
+                "value": "ESP1089673",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 141.42855834960938,
+        "y": 651.1428833007812,
+        "wires": [
+            [
+                "a28b8311.bed41"
+            ]
+        ]
+    },
+    {
+        "id": "a28b8311.bed41",
+        "type": "change",
+        "z": "e263b37d.660e1",
+        "name": "Selector",
+        "rules": [
+            {
+                "t": "set",
+                "p": "selectorID",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 363,
+        "y": 651,
+        "wires": [
+            [
+                "d7aebe42.eeb26",
+                "d281fb3c.961978",
+                "adf6cd46.a7429",
+                "d972e8e9.3c9ce8"
+            ]
+        ]
+    },
+    {
+        "id": "57ea54c1.2dc02c",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Pablo_SwitchStatus",
+        "topic": "infind/GRUPO8/ESP833295/switch/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 109.71428680419922,
+        "y": 474.71429538726807,
+        "wires": [
+            [
+                "5e94ce7d.6a6cb"
+            ]
+        ]
+    },
+    {
+        "id": "2d12ffa4.eb77f",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Sergio_SwitchStatus",
+        "topic": "infind/GRUPO8/ESP5821794/switch/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 105.85713958740234,
+        "y": 510.4285840988159,
+        "wires": [
+            [
+                "5e94ce7d.6a6cb"
+            ]
+        ]
+    },
+    {
+        "id": "e7749d3b.30a1b",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Adri_SwitchStatus",
+        "topic": "infind/GRUPO8/ESP1089673/switch/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 110.57142639160156,
+        "y": 551.2856960296631,
+        "wires": [
+            [
+                "5e94ce7d.6a6cb"
+            ]
+        ]
+    },
+    {
+        "id": "de660132.42591",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Pablo_LedStatus",
+        "topic": "infind/GRUPO8/ESP833295/led/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 96,
+        "y": 285,
+        "wires": [
+            [
+                "ba5dea8e.29b528"
+            ]
+        ]
+    },
+    {
+        "id": "63b2c271.ed692c",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Sergio_LedStatus",
+        "topic": "infind/GRUPO8/ESP5821794/led/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 102.14286041259766,
+        "y": 322.1428427696228,
+        "wires": [
+            [
+                "ba5dea8e.29b528"
+            ]
+        ]
+    },
+    {
+        "id": "4144bbf9.df07d4",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Adri_LedStatus",
+        "topic": "infind/GRUPO8/ESP1089673/led/status",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 89.71428680419922,
+        "y": 360.1428680419922,
+        "wires": [
+            [
+                "ba5dea8e.29b528"
+            ]
+        ]
+    },
+    {
+        "id": "3615ccb.3324d34",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Pablo_Conexion",
+        "topic": "infind/GRUPO8/ESP833295/conexion",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 95,
+        "y": 93,
+        "wires": [
+            [
+                "8988214b.59fbb"
+            ]
+        ]
+    },
+    {
+        "id": "dc71dbf1.ad2dd8",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Sergio_Conexion",
+        "topic": "infind/GRUPO8/ESP5821794/conexion",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 92.5714340209961,
+        "y": 130.14285469055176,
+        "wires": [
+            [
+                "8988214b.59fbb"
+            ]
+        ]
+    },
+    {
+        "id": "da1e3e0a.438ed",
+        "type": "mqtt in",
+        "z": "e263b37d.660e1",
+        "name": "Adri_Conexion",
+        "topic": "infind/GRUPO8/ESP1089673/conexion",
+        "qos": "2",
+        "broker": "f5e9494d.283648",
+        "x": 91.57142639160156,
+        "y": 169.5714340209961,
+        "wires": [
+            [
+                "8988214b.59fbb"
+            ]
+        ]
+    },
+    {
+        "id": "5be2c82a.d4cc08",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "1e3bf2d3.9e2f9d",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Hora",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1247.1430892944336,
+        "y": 375.7142734527588,
+        "wires": []
+    },
+    {
+        "id": "6d378c51.3e8464",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "1e3bf2d3.9e2f9d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Fecha",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1240.9524841308594,
+        "y": 299.36506271362305,
+        "wires": []
+    },
+    {
+        "id": "56113d3a.de8954",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Origen LED",
+        "label": "Origen LED",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 737.5000114440918,
+        "y": 210.00001907348633,
+        "wires": []
+    },
+    {
+        "id": "789f025.2346bfc",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "a5f7fe0c.0b8ec",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Origen Switch",
+        "label": "Origen Switch",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 755,
+        "y": 521.25,
+        "wires": []
+    },
+    {
+        "id": "6aae0b2c.05e254",
+        "type": "function",
+        "z": "e263b37d.660e1",
+        "name": "+ fecha",
+        "func": "msg.payload.date = new Date();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 495,
+        "y": 931,
+        "wires": [
+            [
+                "6a74c4b3.eb758c"
+            ]
+        ]
+    },
+    {
+        "id": "e1f3dda4.6a2b7",
+        "type": "ui_text",
+        "z": "e263b37d.660e1",
+        "group": "7a2cbf0.1f3114",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Online",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 770,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "c88415c1.275138",
+        "type": "debug",
+        "z": "e263b37d.660e1",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "f5e9494d.283648",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "55c62422.ff605c",
+        "type": "ui_group",
+        "name": "WiFi",
+        "tab": "d5b21230.e4058",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "7a2cbf0.1f3114",
+        "type": "ui_group",
+        "name": "Conexión",
+        "tab": "d5b21230.e4058",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "14055e45.e5bb12",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "d5b21230.e4058",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "a5f7fe0c.0b8ec",
+        "type": "ui_group",
+        "name": "Actuadores",
+        "tab": "d5b21230.e4058",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "ca4c64d0.67b3c8",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "II8",
+        "name": ""
+    },
+    {
+        "id": "454c74fd.3fcbac",
+        "type": "ui_group",
+        "name": "Selector",
+        "tab": "d5b21230.e4058",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "1e3bf2d3.9e2f9d",
+        "type": "ui_group",
+        "name": "Última actualización",
+        "tab": "d5b21230.e4058",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "d5b21230.e4058",
+        "type": "ui_tab",
+        "name": "Datos actuales",
+        "icon": "dashboard",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    }
+]
